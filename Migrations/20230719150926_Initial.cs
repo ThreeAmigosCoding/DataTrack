@@ -111,6 +111,12 @@ namespace DataTrack.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    FirstName = table.Column<string>(type: "longtext", nullable: false),
+                    LastName = table.Column<string>(type: "longtext", nullable: false),
+                    Email = table.Column<string>(type: "longtext", nullable: false),
+                    Password = table.Column<string>(type: "longtext", nullable: false),
+                    Role = table.Column<string>(type: "longtext", nullable: false),
+                    RegisteredById = table.Column<Guid>(type: "char(36)", nullable: true),
                     AnalogInputId = table.Column<Guid>(type: "char(36)", nullable: true),
                     DigitalInputId = table.Column<Guid>(type: "char(36)", nullable: true)
                 },
@@ -126,6 +132,11 @@ namespace DataTrack.Migrations
                         name: "FK_Users_DigitalInput_DigitalInputId",
                         column: x => x.DigitalInputId,
                         principalTable: "DigitalInput",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Users_Users_RegisteredById",
+                        column: x => x.RegisteredById,
+                        principalTable: "Users",
                         principalColumn: "Id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
@@ -144,6 +155,11 @@ namespace DataTrack.Migrations
                 name: "IX_Users_DigitalInputId",
                 table: "Users",
                 column: "DigitalInputId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RegisteredById",
+                table: "Users",
+                column: "RegisteredById");
         }
 
         /// <inheritdoc />
