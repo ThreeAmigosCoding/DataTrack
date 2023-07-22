@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230718171059_Initial")]
+    [Migration("20230722135907_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -176,10 +176,32 @@ namespace DataTrack.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<bool>("Admin")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<Guid?>("AnalogInputId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid?>("DigitalInputId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("RegisteredById")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
@@ -187,6 +209,8 @@ namespace DataTrack.Migrations
                     b.HasIndex("AnalogInputId");
 
                     b.HasIndex("DigitalInputId");
+
+                    b.HasIndex("RegisteredById");
 
                     b.ToTable("Users");
                 });
@@ -211,6 +235,12 @@ namespace DataTrack.Migrations
                     b.HasOne("DataTrack.Model.DigitalInput", null)
                         .WithMany("Users")
                         .HasForeignKey("DigitalInputId");
+
+                    b.HasOne("DataTrack.Model.User", "RegisteredBy")
+                        .WithMany()
+                        .HasForeignKey("RegisteredById");
+
+                    b.Navigation("RegisteredBy");
                 });
 
             modelBuilder.Entity("DataTrack.Model.AnalogInput", b =>
