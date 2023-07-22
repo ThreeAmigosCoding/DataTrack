@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230719150926_Initial")]
+    [Migration("20230722135907_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -176,6 +176,9 @@ namespace DataTrack.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<bool>("Admin")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<Guid?>("AnalogInputId")
                         .HasColumnType("char(36)");
 
@@ -200,10 +203,6 @@ namespace DataTrack.Migrations
 
                     b.Property<Guid?>("RegisteredById")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 

@@ -115,7 +115,7 @@ namespace DataTrack.Migrations
                     LastName = table.Column<string>(type: "longtext", nullable: false),
                     Email = table.Column<string>(type: "longtext", nullable: false),
                     Password = table.Column<string>(type: "longtext", nullable: false),
-                    Role = table.Column<string>(type: "longtext", nullable: false),
+                    Admin = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     RegisteredById = table.Column<Guid>(type: "char(36)", nullable: true),
                     AnalogInputId = table.Column<Guid>(type: "char(36)", nullable: true),
                     DigitalInputId = table.Column<Guid>(type: "char(36)", nullable: true)

@@ -7,5 +7,5 @@ public interface IUserService
 {
     public Task<User> RegisterUser(UserDto user, string registeredBy);
 
-    public Task<User> Login(string email, string password);
+    public Task<string> Login(LoginDto loginDto);
 }

@@ -14,7 +14,7 @@ public class User : IBaseEntity
     
     public string Password { get; set; }
     
-    public string Role { get; set; }
+    public bool Admin { get; set; }
     
     public User? RegisteredBy { get; set; }
 
@@ -22,15 +22,15 @@ public class User : IBaseEntity
     {
     }
 
-    public User(Guid id, string firstName, string lastName, string email, string password, string role, 
-        User registeredBy)
+    public User(Guid id, string firstName, string lastName, string email, string password, 
+        bool adming, User? registeredBy)
     {
         Id = id;
         FirstName = firstName;
         LastName = lastName;
         Email = email;
         Password = password;
-        Role = role;
+        Admin = adming;
         RegisteredBy = registeredBy;
     }
 }

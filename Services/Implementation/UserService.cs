@@ -1,4 +1,6 @@
-﻿using DataTrack.Dto;
+﻿using System.Security.Authentication;
+using DataTrack.Auth;
+using DataTrack.Dto;
 using DataTrack.Model;
 using DataTrack.Repositories.Interface;
 using DataTrack.Services.Interface;
@@ -27,13 +29,20 @@ public class UserService : IUserService
         user.LastName = userDto.LastName;
         user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
         //user.RegisteredBy = await _userRepository.FindByEmail(registeredBy);
-        user.Role = "USER";
+        user.Admin = false;
 
         return await _userRepository.Create(user);
     }
     
-    public Task<User> Login(string email, string password)
+    public async Task<string> Login(LoginDto loginDto)
     {
-        throw new NotImplementedException();
+        User user = await _userRepository.FindByEmail(loginDto.Email) ?? 
+                    throw new AuthenticationException("Wrong email or password.");
+
+        if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
+            throw new AuthenticationException("Wrong email or password.");
+        
+        return TokenUtils.GenerateToken(user);
     }
+
 }
