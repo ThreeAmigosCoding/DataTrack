@@ -23,7 +23,7 @@ public class UserController : ControllerBase
     public async Task<ActionResult> Register([FromBody] UserDto userDto, [FromQuery] string registeredBy)
     {
         await _userService.RegisterUser(userDto, registeredBy);
-        return Ok("Registration successful");
+        return Ok(new ResponseMessageDto("Registration successful"));
     }
 
     [AllowAnonymous]
@@ -37,7 +37,7 @@ public class UserController : ControllerBase
         }
         catch (AuthenticationException e)
         {
-            return BadRequest(new ErrorDto(e.Message));
+            return BadRequest(new ResponseMessageDto(e.Message));
         }
     }
     

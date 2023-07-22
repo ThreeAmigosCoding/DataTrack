@@ -28,7 +28,7 @@ public class UserService : IUserService
         user.FirstName = userDto.FirstName;
         user.LastName = userDto.LastName;
         user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-        //user.RegisteredBy = await _userRepository.FindByEmail(registeredBy);
+        user.RegisteredBy = await _userRepository.FindByEmail(registeredBy);
         user.Admin = false;
 
         return await _userRepository.Create(user);

@@ -1,14 +1,14 @@
 ﻿namespace DataTrack.Dto;
 
-public class ErrorDto
+public class ResponseMessageDto
 {
     public string Message { get; set; }
 
-    public ErrorDto()
+    public ResponseMessageDto()
     {
     }
 
-    public ErrorDto(string message)
+    public ResponseMessageDto(string message)
     {
         Message = message;
     }
