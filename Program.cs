@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+# region Auth
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -37,9 +39,13 @@ builder.Services.AddAuthorization(options =>
         p.RequireClaim(IdentityData.AdminUserClaimName, "True"));
 });
 
+# endregion
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+# region Database
 
 // builder.Services.AddSingleton<DatabaseContext>();
 // Register the DatabaseContext with the dependency injection container
@@ -48,21 +54,37 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb");
 });
 
+# endregion
+
+# region Repositories
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+
+# endregion
+
+# region Services
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
+
+# endregion
+
+# region CORS
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularApp",
-        builder =>
+        x =>
         {
-            builder.WithOrigins("http://localhost:4200")
+            x.WithOrigins("http://localhost:4200")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
         });
 });
+
+# endregion
 
 var app = builder.Build();
 
