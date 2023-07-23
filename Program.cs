@@ -1,5 +1,6 @@
 using System.Text;
 using DataTrack.Auth;
+using DataTrack.Config;
 using DataTrack.DataBase;
 using DataTrack.Repositories.Implementation;
 using DataTrack.Repositories.Interface;
@@ -102,5 +103,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+ScadaConfig.LoadScadaConfig();
 
 app.Run();
