@@ -1,4 +1,5 @@
-﻿using DataTrack.DataBase;
+﻿using DataTrack.Config;
+using DataTrack.DataBase;
 using DataTrack.Model.Utils;
 using DataTrack.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -19,53 +20,95 @@ public class CrudRepository<T> : ICrudRepository<T> where T : class, IBaseEntity
     //TODO: implement semaphore later
     public virtual async Task<IEnumerable<T>> ReadAll()
     {
+        await ScadaConfig.dbSemaphore.WaitAsync();
         IEnumerable<T> data;
-        data = _entities.ToList();
+        try
+        {
+            data = _entities.ToList();
+        }
+        finally
+        {
+            ScadaConfig.dbSemaphore.Release();
+        }
         return data;
     }
 
     public virtual async Task<T> Read(Guid id)
     {
+        await ScadaConfig.dbSemaphore.WaitAsync();
         T data;
-        data = _entities.FirstOrDefault(e => e.Id == id);
+        try
+        {
+            data = _entities.FirstOrDefault(e => e.Id == id);
+        }
+        finally
+        {
+            ScadaConfig.dbSemaphore.Release();
+        }
         return data;
     }
 
     public virtual async Task<T> Create(T entity)
     {
-        _entities.Add(entity);
-        _context.SaveChanges();
-        await Task.Delay(1);
+        await ScadaConfig.dbSemaphore.WaitAsync();
+
+        try
+        {
+            _entities.Add(entity);
+            _context.SaveChanges();
+            await Task.Delay(1);
+        }
+        finally
+        {
+            ScadaConfig.dbSemaphore.Release();
+        }
+        
         return entity;
     }
 
     public virtual async Task<T> Update(T entity)
     {
         T entityToUpdate;
-        
-        entityToUpdate = _entities.FirstOrDefault(e => e.Id == entity.Id);
-        if (entityToUpdate != null)
+        await ScadaConfig.dbSemaphore.WaitAsync();
+
+        try
         {
-            _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
-            _context.SaveChanges();
-            await Task.Delay(1);
+            entityToUpdate = _entities.FirstOrDefault(e => e.Id == entity.Id);
+            if (entityToUpdate != null)
+            {
+                _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
+                _context.SaveChanges();
+                await Task.Delay(1);
+            }
         }
-        
+        finally
+        {
+            ScadaConfig.dbSemaphore.Release();
+        }
+
         return entityToUpdate;
     }
 
     public virtual async Task<T> Delete(Guid id)
     {
         T entityToDelete;
+        await ScadaConfig.dbSemaphore.WaitAsync();
 
-        entityToDelete=_entities.FirstOrDefault(e => e.Id == id);
-        if (entityToDelete != null)
+        try
         {
-            _context.Remove(entityToDelete);
-            _context.SaveChanges();
-            await Task.Delay(1);
+            entityToDelete=_entities.FirstOrDefault(e => e.Id == id);
+            if (entityToDelete != null)
+            {
+                _context.Remove(entityToDelete);
+                _context.SaveChanges();
+                await Task.Delay(1);
+            }
         }
-        
+        finally
+        {
+            ScadaConfig.dbSemaphore.Release();
+        }
+
         return entityToDelete;
     }
 }

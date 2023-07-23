@@ -14,7 +14,7 @@ public class DeviceService : IDeviceService
         _deviceRepository = deviceRepository;
     }
     
-    public async Task<Device> createDevice(DeviceDto deviceDto)
+    public async Task<Device> CreateDevice(DeviceDto deviceDto)
     {
         if (await _deviceRepository.FindByName(deviceDto.Name) != null)
             throw new Exception("Device with this name already exists!");
@@ -29,5 +29,15 @@ public class DeviceService : IDeviceService
         };
         
         return await _deviceRepository.Create(device);
+    }
+
+    public async Task<List<Device>> ReadAll()
+    {
+        return (await _deviceRepository.ReadAll()).ToList();
+    }
+
+    public Task<Device> Update(Device device)
+    {
+        return _deviceRepository.Update(device);
     }
 }

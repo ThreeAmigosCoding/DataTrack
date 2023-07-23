@@ -69,6 +69,8 @@ builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
 
+builder.Services.AddHostedService<SimulationService>();
+
 # endregion
 
 # region CORS
@@ -103,7 +105,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-ScadaConfig.LoadScadaConfig();
 
 app.Run();

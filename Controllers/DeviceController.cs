@@ -23,7 +23,7 @@ public class DeviceController : ControllerBase
     {
         try
         {
-            await _deviceService.createDevice(deviceDto);
+            await _deviceService.CreateDevice(deviceDto);
             return Ok(new ResponseMessageDto("Device created successfully!"));
         }
         catch (Exception e)
