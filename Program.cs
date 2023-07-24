@@ -63,7 +63,7 @@ builder.Services.AddSingleton<DatabaseContext>(sp =>
     return new DatabaseContext(options);
 });
 
-
+builder.Services.AddSingleton<DataBaseContextSeed>();
 # endregion
 
 # region Repositories
@@ -114,5 +114,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var dbContextSeed = app.Services.GetRequiredService<DataBaseContextSeed>();
+dbContextSeed.Seed();
 
 app.Run();
