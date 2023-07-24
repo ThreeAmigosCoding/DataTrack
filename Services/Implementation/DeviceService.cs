@@ -41,4 +41,10 @@ public class DeviceService : IDeviceService
     {
         return _deviceRepository.Update(device);
     }
+
+    public async Task<Device> FindByIoAddress(string ioAddress)
+    {
+        return await _deviceRepository.FindByIoAddress(ioAddress) ?? 
+               throw new Exception("There is no device with the specified address.");
+    }
 }

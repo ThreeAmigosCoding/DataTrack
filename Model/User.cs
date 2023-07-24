@@ -17,13 +17,16 @@ public class User : IBaseEntity
     public bool Admin { get; set; }
     
     public User? RegisteredBy { get; set; }
+    
+    public List<AnalogInput> AnalogInputs { get; set; }
+    public List<DigitalInput> DigitalInputs { get; set; }
 
     public User()
     {
     }
 
     public User(Guid id, string firstName, string lastName, string email, string password, 
-        bool adming, User? registeredBy)
+        bool adming, User? registeredBy, List<AnalogInput> analogInputs, List<DigitalInput> digitalInputs)
     {
         Id = id;
         FirstName = firstName;
@@ -32,5 +35,7 @@ public class User : IBaseEntity
         Password = password;
         Admin = adming;
         RegisteredBy = registeredBy;
+        AnalogInputs = analogInputs;
+        DigitalInputs = digitalInputs;
     }
 }

@@ -47,4 +47,8 @@ public class UserService : IUserService
         return TokenUtils.GenerateToken(user);
     }
 
+    public async Task<List<User>> FindUsersByAdmin(Guid adminId)
+    {
+        return await _userRepository.FindByAdminId(adminId);
+    }
 }
