@@ -23,21 +23,23 @@ public class UserService : IUserService
             throw new Exception("User already registered");
         }
 
-        User user = new User();
-        user.Email = userDto.Email;
-        user.FirstName = userDto.FirstName;
-        user.LastName = userDto.LastName;
-        user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-        user.RegisteredBy = await _userRepository.FindByEmail(registeredBy);
-        user.Admin = false;
+        var user = new User
+        {
+            Email = userDto.Email,
+            FirstName = userDto.FirstName,
+            LastName = userDto.LastName,
+            Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
+            RegisteredBy = await _userRepository.FindByEmail(registeredBy),
+            Admin = false
+        };
 
         return await _userRepository.Create(user);
     }
     
     public async Task<string> Login(LoginDto loginDto)
     {
-        User user = await _userRepository.FindByEmail(loginDto.Email) ?? 
-                    throw new AuthenticationException("Wrong email or password.");
+        var user = await _userRepository.FindByEmail(loginDto.Email) ?? 
+                   throw new AuthenticationException("Wrong email or password.");
 
         if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             throw new AuthenticationException("Wrong email or password.");

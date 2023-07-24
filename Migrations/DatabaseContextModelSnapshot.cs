@@ -116,6 +116,41 @@ namespace DataTrack.Migrations
                     b.ToTable("AnalogOutput");
                 });
 
+            modelBuilder.Entity("DataTrack.Model.Device", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Driver")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("IOAddress")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDigital")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("LowerBound")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UpperBound")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Devices");
+                });
+
             modelBuilder.Entity("DataTrack.Model.DigitalInput", b =>
                 {
                     b.Property<Guid>("Id")

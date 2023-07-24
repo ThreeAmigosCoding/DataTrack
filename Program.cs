@@ -1,5 +1,6 @@
 using System.Text;
 using DataTrack.Auth;
+using DataTrack.Config;
 using DataTrack.DataBase;
 using DataTrack.Repositories.Implementation;
 using DataTrack.Repositories.Interface;
@@ -11,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+# region Auth
 
 builder.Services.AddAuthentication(x =>
 {
@@ -37,32 +40,63 @@ builder.Services.AddAuthorization(options =>
         p.RequireClaim(IdentityData.AdminUserClaimName, "True"));
 });
 
+# endregion
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.Services.AddSingleton<DatabaseContext>();
+# region Database
+
+//builder.Services.AddSingleton<DatabaseContext>();
 // Register the DatabaseContext with the dependency injection container
-builder.Services.AddDbContext<DatabaseContext>(options =>
+// builder.Services.AddDbContext<DatabaseContext>(options =>
+// {
+//     options.UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb");
+// });
+builder.Services.AddSingleton<DatabaseContext>(sp =>
 {
-    options.UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb");
+    var options = new DbContextOptionsBuilder<DatabaseContext>()
+        .UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb")
+        .Options;
+
+    return new DatabaseContext(options);
 });
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IUserService, UserService>();
+# endregion
+
+# region Repositories
+
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IDeviceRepository, DeviceRepository>();
+
+# endregion
+
+# region Services
+
+builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<IDeviceService, DeviceService>();
+
+builder.Services.AddHostedService<SimulationService>();
+
+# endregion
+
+# region CORS
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularApp",
-        builder =>
+        x =>
         {
-            builder.WithOrigins("http://localhost:4200")
+            x.WithOrigins("http://localhost:4200")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
         });
 });
+
+# endregion
 
 var app = builder.Build();
 

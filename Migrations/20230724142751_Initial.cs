@@ -52,6 +52,25 @@ namespace DataTrack.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Devices",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    IOAddress = table.Column<string>(type: "longtext", nullable: false),
+                    LowerBound = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<double>(type: "double", nullable: false),
+                    UpperBound = table.Column<int>(type: "int", nullable: false),
+                    IsDigital = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Driver = table.Column<string>(type: "longtext", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Devices", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "DigitalInput",
                 columns: table => new
                 {
@@ -170,6 +189,9 @@ namespace DataTrack.Migrations
 
             migrationBuilder.DropTable(
                 name: "AnalogOutput");
+
+            migrationBuilder.DropTable(
+                name: "Devices");
 
             migrationBuilder.DropTable(
                 name: "DigitalOutput");
