@@ -122,6 +122,10 @@ namespace DataTrack.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("Driver")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("IOAddress")
                         .IsRequired()
                         .HasColumnType("longtext");

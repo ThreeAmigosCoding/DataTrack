@@ -61,7 +61,8 @@ namespace DataTrack.Migrations
                     LowerBound = table.Column<int>(type: "int", nullable: false),
                     Value = table.Column<double>(type: "double", nullable: false),
                     UpperBound = table.Column<int>(type: "int", nullable: false),
-                    IsDigital = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsDigital = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Driver = table.Column<string>(type: "longtext", nullable: false)
                 },
                 constraints: table =>
                 {

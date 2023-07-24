@@ -48,26 +48,35 @@ builder.Services.AddSwaggerGen();
 
 # region Database
 
-// builder.Services.AddSingleton<DatabaseContext>();
+//builder.Services.AddSingleton<DatabaseContext>();
 // Register the DatabaseContext with the dependency injection container
-builder.Services.AddDbContext<DatabaseContext>(options =>
+// builder.Services.AddDbContext<DatabaseContext>(options =>
+// {
+//     options.UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb");
+// });
+builder.Services.AddSingleton<DatabaseContext>(sp =>
 {
-    options.UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb");
+    var options = new DbContextOptionsBuilder<DatabaseContext>()
+        .UseMySQL("server=localhost;port=3306;user=root;password=root123;database=datatrackdb")
+        .Options;
+
+    return new DatabaseContext(options);
 });
+
 
 # endregion
 
 # region Repositories
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IDeviceRepository, DeviceRepository>();
 
 # endregion
 
 # region Services
 
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IDeviceService, DeviceService>();
+builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<IDeviceService, DeviceService>();
 
 builder.Services.AddHostedService<SimulationService>();
 

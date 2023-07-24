@@ -9,13 +9,14 @@ public class DeviceDto
     public double? Value { get; set; }
     public int UpperBound { get; set; }
     public bool IsDigital { get; set; }
+    public string Driver { get; set; }
 
     public DeviceDto()
     {
     }
 
-    public DeviceDto(Guid id, string name, string ioAddress, int lowerBound, double value, 
-        int upperBound, bool isDigital)
+    public DeviceDto(Guid? id, string name, string? ioAddress, int lowerBound, double? value, 
+        int upperBound, bool isDigital, string driver)
     {
         Id = id;
         Name = name;
@@ -24,5 +25,6 @@ public class DeviceDto
         Value = value;
         UpperBound = upperBound;
         IsDigital = isDigital;
+        Driver = driver;
     }
 }

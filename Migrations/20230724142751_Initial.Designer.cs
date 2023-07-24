@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230723153238_Initial")]
+    [Migration("20230724142751_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -124,6 +124,10 @@ namespace DataTrack.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Driver")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("IOAddress")
                         .IsRequired()
