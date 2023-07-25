@@ -10,4 +10,6 @@ public interface IDeviceService
     public Task<List<Device>>ReadAll();
 
     public Task<Device> Update(Device device);
+    
+    public Task<Device> FindByIoAddress(string ioAddress);
 }

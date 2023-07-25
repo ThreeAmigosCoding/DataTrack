@@ -16,4 +16,12 @@ public class UserRepository : CrudRepository<User>, IUserRepository
         await Task.Delay(1);
         return await _entities.FirstOrDefaultAsync(x => x.Email == email);
     }
+
+    public async Task<List<User>> FindByAdminId(Guid adminId)
+    {
+        await Task.Delay(1);
+        return await _entities
+            .Where(x => x.Id == adminId || x.RegisteredBy.Id == adminId)
+            .ToListAsync();
+    }
 }

@@ -16,4 +16,10 @@ public class DeviceRepository : CrudRepository<Device>, IDeviceRepository
         await Task.Delay(1);
         return await _entities.FirstOrDefaultAsync(x => x.Name == name);
     }
+
+    public async Task<Device?> FindByIoAddress(string ioAddress)
+    {
+        await Task.Delay(1);
+        return await _entities.FirstOrDefaultAsync(x => x.IOAddress == ioAddress);
+    }
 }

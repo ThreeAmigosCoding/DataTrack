@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230724142751_Initial")]
+    [Migration("20230725142321_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -58,10 +58,6 @@ namespace DataTrack.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Driver")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -164,10 +160,6 @@ namespace DataTrack.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Driver")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("IOAddress")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -214,15 +206,9 @@ namespace DataTrack.Migrations
                     b.Property<bool>("Admin")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<Guid?>("AnalogInputId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("DigitalInputId")
-                        .HasColumnType("char(36)");
-
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -241,13 +227,42 @@ namespace DataTrack.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AnalogInputId");
-
-                    b.HasIndex("DigitalInputId");
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("RegisteredById");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("UsersAnalogInputs", b =>
+                {
+                    b.Property<Guid>("AnalogInputsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("AnalogInputsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("UsersAnalogInputs");
+                });
+
+            modelBuilder.Entity("UsersDigitalInputs", b =>
+                {
+                    b.Property<Guid>("DigitalInputsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("DigitalInputsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("UsersDigitalInputs");
                 });
 
             modelBuilder.Entity("DataTrack.Model.Alarm", b =>
@@ -263,14 +278,6 @@ namespace DataTrack.Migrations
 
             modelBuilder.Entity("DataTrack.Model.User", b =>
                 {
-                    b.HasOne("DataTrack.Model.AnalogInput", null)
-                        .WithMany("Users")
-                        .HasForeignKey("AnalogInputId");
-
-                    b.HasOne("DataTrack.Model.DigitalInput", null)
-                        .WithMany("Users")
-                        .HasForeignKey("DigitalInputId");
-
                     b.HasOne("DataTrack.Model.User", "RegisteredBy")
                         .WithMany()
                         .HasForeignKey("RegisteredById");
@@ -278,16 +285,39 @@ namespace DataTrack.Migrations
                     b.Navigation("RegisteredBy");
                 });
 
+            modelBuilder.Entity("UsersAnalogInputs", b =>
+                {
+                    b.HasOne("DataTrack.Model.AnalogInput", null)
+                        .WithMany()
+                        .HasForeignKey("AnalogInputsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataTrack.Model.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("UsersDigitalInputs", b =>
+                {
+                    b.HasOne("DataTrack.Model.DigitalInput", null)
+                        .WithMany()
+                        .HasForeignKey("DigitalInputsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataTrack.Model.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DataTrack.Model.AnalogInput", b =>
                 {
                     b.Navigation("Alarms");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("DataTrack.Model.DigitalInput", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

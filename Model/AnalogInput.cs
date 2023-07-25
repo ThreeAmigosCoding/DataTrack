@@ -2,11 +2,11 @@
 
 namespace DataTrack.Model;
 
+
 public class AnalogInput : IBaseEntity
 {
     public Guid Id { get; set; }
     public string Description { get; set; }
-    public string Driver { get; set; }
     public string IOAddress { get; set; }
     public int ScanTime { get; set; }
     public bool ScanOn { get; set; }
@@ -18,12 +18,11 @@ public class AnalogInput : IBaseEntity
 
     public AnalogInput() { }
 
-    public AnalogInput(Guid id, string description, string driver, string ioAddress, int scanTime, bool scanOn, 
+    public AnalogInput(Guid id, string description, string ioAddress, int scanTime, bool scanOn, 
         double lowLimit, double highLimit, string unit, List<Alarm> alarms, List<User> users)
     {
         Id = id;
         Description = description;
-        Driver = driver;
         IOAddress = ioAddress;
         ScanTime = scanTime;
         ScanOn = scanOn;

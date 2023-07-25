@@ -28,19 +28,19 @@ public class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // modelBuilder.Entity<User>()
-        //     .HasIndex(c => new { c.Email })
-        //     .IsUnique(true);
-        //
-        // modelBuilder.Entity<User>()
-        //     .HasMany(e => e.AnalogInputs)
-        //     .WithMany(e => e.Users)
-        //     .UsingEntity("UsersToAnalogInputsJoinTable");
-        //
-        // modelBuilder.Entity<User>()
-        //     .HasMany(e => e.DigitalInputs)
-        //     .WithMany(e => e.Users)
-        //     .UsingEntity("UsersToDigitalInputsJoinTable");
+        modelBuilder.Entity<User>()
+            .HasIndex(c => new { c.Email })
+            .IsUnique(true);
+        
+        modelBuilder.Entity<User>()
+            .HasMany(e => e.AnalogInputs)
+            .WithMany(e => e.Users)
+            .UsingEntity("UsersAnalogInputs");
+        
+        modelBuilder.Entity<User>()
+            .HasMany(e => e.DigitalInputs)
+            .WithMany(e => e.Users)
+            .UsingEntity("UsersDigitalInputs");
     }
 
 }

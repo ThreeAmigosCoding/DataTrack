@@ -57,9 +57,9 @@ public class SimulationService : IHostedService
                     {
                         var randValue = rand.Next(device.LowerBound, device.UpperBound);
                         var avg = (device.LowerBound + device.UpperBound) / 2;
-    
-                        if (device.IsDigital) 
-                            device.Value = randValue > avg ? 1 : 0;
+
+                        if (device.IsDigital)
+                            device.Value = rand.Next(device.LowerBound, device.UpperBound + 1);
                         else
                         {
                             double newVal;

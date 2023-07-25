@@ -26,7 +26,8 @@ public class DeviceService : IDeviceService
             IsDigital = deviceDto.IsDigital,
             LowerBound = deviceDto.LowerBound,
             UpperBound = deviceDto.UpperBound,
-            Driver = deviceDto.Driver
+            Driver = deviceDto.Driver,
+            Value = (deviceDto.LowerBound + deviceDto.UpperBound) / 2
         };
         
         return await _deviceRepository.Create(device);
@@ -40,5 +41,11 @@ public class DeviceService : IDeviceService
     public Task<Device> Update(Device device)
     {
         return _deviceRepository.Update(device);
+    }
+
+    public async Task<Device> FindByIoAddress(string ioAddress)
+    {
+        return await _deviceRepository.FindByIoAddress(ioAddress) ?? 
+               throw new Exception("There is no device with the specified address.");
     }
 }

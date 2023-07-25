@@ -20,7 +20,6 @@ namespace DataTrack.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false),
-                    Driver = table.Column<string>(type: "longtext", nullable: false),
                     IOAddress = table.Column<string>(type: "longtext", nullable: false),
                     ScanTime = table.Column<int>(type: "int", nullable: false),
                     ScanOn = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -76,7 +75,6 @@ namespace DataTrack.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false),
-                    Driver = table.Column<string>(type: "longtext", nullable: false),
                     IOAddress = table.Column<string>(type: "longtext", nullable: false),
                     ScanTime = table.Column<int>(type: "int", nullable: false),
                     ScanOn = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -99,6 +97,29 @@ namespace DataTrack.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DigitalOutput", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    FirstName = table.Column<string>(type: "longtext", nullable: false),
+                    LastName = table.Column<string>(type: "longtext", nullable: false),
+                    Email = table.Column<string>(type: "varchar(255)", nullable: false),
+                    Password = table.Column<string>(type: "longtext", nullable: false),
+                    Admin = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    RegisteredById = table.Column<Guid>(type: "char(36)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Users_RegisteredById",
+                        column: x => x.RegisteredById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -126,37 +147,52 @@ namespace DataTrack.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "UsersAnalogInputs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    FirstName = table.Column<string>(type: "longtext", nullable: false),
-                    LastName = table.Column<string>(type: "longtext", nullable: false),
-                    Email = table.Column<string>(type: "longtext", nullable: false),
-                    Password = table.Column<string>(type: "longtext", nullable: false),
-                    Admin = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    RegisteredById = table.Column<Guid>(type: "char(36)", nullable: true),
-                    AnalogInputId = table.Column<Guid>(type: "char(36)", nullable: true),
-                    DigitalInputId = table.Column<Guid>(type: "char(36)", nullable: true)
+                    AnalogInputsId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    UsersId = table.Column<Guid>(type: "char(36)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_UsersAnalogInputs", x => new { x.AnalogInputsId, x.UsersId });
                     table.ForeignKey(
-                        name: "FK_Users_AnalogInput_AnalogInputId",
-                        column: x => x.AnalogInputId,
+                        name: "FK_UsersAnalogInputs_AnalogInput_AnalogInputsId",
+                        column: x => x.AnalogInputsId,
                         principalTable: "AnalogInput",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Users_DigitalInput_DigitalInputId",
-                        column: x => x.DigitalInputId,
-                        principalTable: "DigitalInput",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Users_Users_RegisteredById",
-                        column: x => x.RegisteredById,
+                        name: "FK_UsersAnalogInputs_Users_UsersId",
+                        column: x => x.UsersId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "UsersDigitalInputs",
+                columns: table => new
+                {
+                    DigitalInputsId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    UsersId = table.Column<Guid>(type: "char(36)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UsersDigitalInputs", x => new { x.DigitalInputsId, x.UsersId });
+                    table.ForeignKey(
+                        name: "FK_UsersDigitalInputs_DigitalInput_DigitalInputsId",
+                        column: x => x.DigitalInputsId,
+                        principalTable: "DigitalInput",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UsersDigitalInputs_Users_UsersId",
+                        column: x => x.UsersId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -166,19 +202,25 @@ namespace DataTrack.Migrations
                 column: "AnalogInputId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_AnalogInputId",
+                name: "IX_Users_Email",
                 table: "Users",
-                column: "AnalogInputId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_DigitalInputId",
-                table: "Users",
-                column: "DigitalInputId");
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RegisteredById",
                 table: "Users",
                 column: "RegisteredById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UsersAnalogInputs_UsersId",
+                table: "UsersAnalogInputs",
+                column: "UsersId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UsersDigitalInputs_UsersId",
+                table: "UsersDigitalInputs",
+                column: "UsersId");
         }
 
         /// <inheritdoc />
@@ -197,13 +239,19 @@ namespace DataTrack.Migrations
                 name: "DigitalOutput");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "UsersAnalogInputs");
+
+            migrationBuilder.DropTable(
+                name: "UsersDigitalInputs");
 
             migrationBuilder.DropTable(
                 name: "AnalogInput");
 
             migrationBuilder.DropTable(
                 name: "DigitalInput");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
