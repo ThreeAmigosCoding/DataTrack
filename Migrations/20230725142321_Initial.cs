@@ -75,7 +75,6 @@ namespace DataTrack.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false),
-                    Driver = table.Column<string>(type: "longtext", nullable: false),
                     IOAddress = table.Column<string>(type: "longtext", nullable: false),
                     ScanTime = table.Column<int>(type: "int", nullable: false),
                     ScanOn = table.Column<bool>(type: "tinyint(1)", nullable: false)

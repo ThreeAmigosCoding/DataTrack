@@ -58,7 +58,7 @@ public class AnalogInputService : IAnalogInputService
                 else if (device.Value < analogInput.LowLimit)
                     Console.WriteLine("Low limit reached");
                 
-                Console.WriteLine("Device Name: " + device.Name + "Value: " + device.Value);
+                Console.WriteLine("Device Name: " + device.Name + "; Value: " + device.Value);
                 
                 await Task.Delay(analogInput.ScanTime);
             }

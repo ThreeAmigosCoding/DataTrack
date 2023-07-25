@@ -20,16 +20,19 @@ public class InputController : ControllerBase
         _digitalInputService = digitalInputService;
     }
 
-    //[Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult> CreateAnalogInput([FromBody] AnalogInputDto analogInputDto)
     {
         AnalogInput analogInput = await _analogInputService.CreateAnalogInput(analogInputDto);
-        return Ok(new ResponseMessageDto("Analog Input created successfully"));
+        return Ok(new ResponseMessageDto("Analog Input created successfully."));
     }
     
-    // public async Task<ActionResult> CreateDigitalInput([FromBody] DigitalInputDto digitalInputDto)
-    // {
-    //     return Ok();
-    // }
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpPost]
+    public async Task<ActionResult> CreateDigitalInput([FromBody] DigitalInputDto digitalInputDto)
+    {
+        DigitalInput digitalInput = await _digitalInputService.CreateDigitalInput(digitalInputDto);
+        return Ok(new ResponseMessageDto("Digital Input created successfully."));
+    }
 }

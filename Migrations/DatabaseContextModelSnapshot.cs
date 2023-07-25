@@ -157,10 +157,6 @@ namespace DataTrack.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Driver")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("IOAddress")
                         .IsRequired()
                         .HasColumnType("longtext");
