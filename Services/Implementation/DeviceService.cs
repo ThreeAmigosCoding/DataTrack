@@ -26,7 +26,8 @@ public class DeviceService : IDeviceService
             IsDigital = deviceDto.IsDigital,
             LowerBound = deviceDto.LowerBound,
             UpperBound = deviceDto.UpperBound,
-            Driver = deviceDto.Driver
+            Driver = deviceDto.Driver,
+            Value = (deviceDto.LowerBound + deviceDto.UpperBound) / 2
         };
         
         return await _deviceRepository.Create(device);

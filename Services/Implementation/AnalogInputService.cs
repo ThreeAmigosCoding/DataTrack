@@ -52,6 +52,7 @@ public class AnalogInputService : IAnalogInputService
                 if (!analogInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(analogInput.IOAddress);
 
+                //TODO: ovde alarmi 
                 if (device.Value > analogInput.HighLimit)
                     Console.WriteLine("High limit reached");
                 else if (device.Value < analogInput.LowLimit)
