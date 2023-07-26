@@ -2,6 +2,8 @@
 using DataTrack.Model;
 using DataTrack.Repositories.Interface;
 using DataTrack.Services.Interface;
+using DataTrack.WebSocketConfig;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DataTrack.Services.Implementation;
 
@@ -10,13 +12,17 @@ public class DigitalInputService : IDigitalInputService
     private readonly IDigitalInputRepository _digitalInputRepository;
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
+    private readonly IHubContext<InputHub, IInputClient> _inputHub;
 
 
-    public DigitalInputService(IDigitalInputRepository digitalInputRepository, IDeviceService deviceService, IUserService userService)
+
+    public DigitalInputService(IDigitalInputRepository digitalInputRepository, IDeviceService deviceService, 
+        IUserService userService, IHubContext<InputHub, IInputClient> inputHub)
     {
         _digitalInputRepository = digitalInputRepository;
         _deviceService = deviceService;
         _userService = userService;
+        _inputHub = inputHub;
     }
 
     public async Task<DigitalInput> CreateDigitalInput(DigitalInputDto digitalInputDto)
@@ -48,6 +54,9 @@ public class DigitalInputService : IDigitalInputService
                 if (!digitalInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(digitalInput.IOAddress);
                 Console.WriteLine("Device Name: " + device.Name + "; Value: " + device.Value);
+                await _inputHub.Clients.All
+                    .ReceiveDigitalData(new ResponseMessageDto("Device Name: " + device.Name + "; Value: " + device.Value));
+
                 await Task.Delay(digitalInput.ScanTime);
                 
             }
