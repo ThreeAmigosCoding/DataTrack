@@ -1,12 +1,12 @@
 using System.Text;
 using DataTrack.Auth;
-using DataTrack.Config;
 using DataTrack.DataBase;
 using DataTrack.Repositories.Implementation;
 using DataTrack.Repositories.Interface;
 using DataTrack.Secrets;
 using DataTrack.Services.Implementation;
 using DataTrack.Services.Interface;
+using DataTrack.WebSocketConfig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -45,6 +45,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 # region Database
 
@@ -118,6 +119,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<InputHub>("/socket/input");
 
 var dbContextSeed = app.Services.GetRequiredService<DataBaseContextSeed>();
 dbContextSeed.Seed();

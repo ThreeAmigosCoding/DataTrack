@@ -2,6 +2,8 @@
 using DataTrack.Model;
 using DataTrack.Repositories.Interface;
 using DataTrack.Services.Interface;
+using DataTrack.WebSocketConfig;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DataTrack.Services.Implementation;
 
@@ -10,13 +12,16 @@ public class AnalogInputService : IAnalogInputService
     private readonly IAnalogInputRepository _analogInputRepository;
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
+    private readonly IHubContext<InputHub, IInputClient> _inputHub;
+
 
     public AnalogInputService(IAnalogInputRepository analogInputRepository, IDeviceService deviceService,
-        IUserService userService)
+        IUserService userService, IHubContext<InputHub, IInputClient> inputHub)
     {
         _userService = userService;
         _deviceService = deviceService;
         _analogInputRepository = analogInputRepository;
+        _inputHub = inputHub;
     }
 
     public async Task<AnalogInput> CreateAnalogInput(AnalogInputDto analogInputDto)
@@ -59,7 +64,9 @@ public class AnalogInputService : IAnalogInputService
                     Console.WriteLine("Low limit reached");
                 
                 Console.WriteLine("Device Name: " + device.Name + "; Value: " + device.Value);
-                
+                await _inputHub.Clients.All
+                    .ReceiveAnalogData(new ResponseMessageDto("Device Name: " + device.Name + "; Value: " + device.Value));
+
                 await Task.Delay(analogInput.ScanTime);
             }
             
