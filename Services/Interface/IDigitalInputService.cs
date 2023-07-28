@@ -7,4 +7,6 @@ public interface IDigitalInputService
 {
     Task<DigitalInput> CreateDigitalInput(DigitalInputDto digitalInputDto);
 
+    public void StartReadingAll();
+
 }

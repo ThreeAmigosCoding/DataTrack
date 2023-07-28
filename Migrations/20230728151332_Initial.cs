@@ -147,6 +147,48 @@ namespace DataTrack.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "AnalogInputRecord",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    RecordedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    AnalogInputId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Value = table.Column<double>(type: "double", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnalogInputRecord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnalogInputRecord_AnalogInput_AnalogInputId",
+                        column: x => x.AnalogInputId,
+                        principalTable: "AnalogInput",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "DigitalInputRecord",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    RecordedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DigitalInputId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Value = table.Column<double>(type: "double", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DigitalInputRecord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DigitalInputRecord_DigitalInput_DigitalInputId",
+                        column: x => x.DigitalInputId,
+                        principalTable: "DigitalInput",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "UsersAnalogInputs",
                 columns: table => new
                 {
@@ -202,6 +244,16 @@ namespace DataTrack.Migrations
                 column: "AnalogInputId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AnalogInputRecord_AnalogInputId",
+                table: "AnalogInputRecord",
+                column: "AnalogInputId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DigitalInputRecord_DigitalInputId",
+                table: "DigitalInputRecord",
+                column: "DigitalInputId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -230,10 +282,16 @@ namespace DataTrack.Migrations
                 name: "Alarm");
 
             migrationBuilder.DropTable(
+                name: "AnalogInputRecord");
+
+            migrationBuilder.DropTable(
                 name: "AnalogOutput");
 
             migrationBuilder.DropTable(
                 name: "Devices");
+
+            migrationBuilder.DropTable(
+                name: "DigitalInputRecord");
 
             migrationBuilder.DropTable(
                 name: "DigitalOutput");

@@ -83,6 +83,28 @@ namespace DataTrack.Migrations
                     b.ToTable("AnalogInput");
                 });
 
+            modelBuilder.Entity("DataTrack.Model.AnalogInputRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AnalogInputId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnalogInputId");
+
+                    b.ToTable("AnalogInputRecord");
+                });
+
             modelBuilder.Entity("DataTrack.Model.AnalogOutput", b =>
                 {
                     b.Property<Guid>("Id")
@@ -170,6 +192,28 @@ namespace DataTrack.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DigitalInput");
+                });
+
+            modelBuilder.Entity("DataTrack.Model.DigitalInputRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("DigitalInputId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DigitalInputId");
+
+                    b.ToTable("DigitalInputRecord");
                 });
 
             modelBuilder.Entity("DataTrack.Model.DigitalOutput", b =>
@@ -271,6 +315,28 @@ namespace DataTrack.Migrations
                         .IsRequired();
 
                     b.Navigation("AnalogInput");
+                });
+
+            modelBuilder.Entity("DataTrack.Model.AnalogInputRecord", b =>
+                {
+                    b.HasOne("DataTrack.Model.AnalogInput", "AnalogInput")
+                        .WithMany()
+                        .HasForeignKey("AnalogInputId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnalogInput");
+                });
+
+            modelBuilder.Entity("DataTrack.Model.DigitalInputRecord", b =>
+                {
+                    b.HasOne("DataTrack.Model.DigitalInput", "DigitalInput")
+                        .WithMany()
+                        .HasForeignKey("DigitalInputId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DigitalInput");
                 });
 
             modelBuilder.Entity("DataTrack.Model.User", b =>
