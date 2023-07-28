@@ -49,4 +49,23 @@ public class UserRepository : CrudRepository<User>, IUserRepository
         return users;
 
     }
+
+    public async Task<User> FindById(Guid id)
+    {
+        await ScadaConfig.dbSemaphore.WaitAsync();
+
+        try
+        {
+            await Task.Delay(1);
+            return await _entities
+                .Include(e => e.AnalogInputs).ThenInclude(e => e.Alarms)
+                .Include(e => e.DigitalInputs)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
+        finally
+        {
+            ScadaConfig.dbSemaphore.Release();
+        }
+        
+    }
 }

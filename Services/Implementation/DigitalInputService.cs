@@ -55,6 +55,28 @@ public class DigitalInputService : IDigitalInputService
         }
     }
 
+    public async Task<List<InputRecordDto>> GetAllByUser(Guid id)
+    {
+        var user = await _userService.FindById(id);
+        if (user == null) throw new Exception("User doesn't exist.");
+        var inputRecords = new List<InputRecordDto>();
+
+        foreach (var input in user.DigitalInputs)
+        {
+            var device = await _deviceService.FindByIoAddress(input.IOAddress);
+            var digitalInputRecord = new DigitalInputRecord
+            {
+                Id = new Guid(),
+                RecordedAt = DateTime.Now,
+                Value = device.Value,
+                DigitalInput = input
+            };
+            inputRecords.Add(new InputRecordDto(digitalInputRecord, device));
+        }
+
+        return inputRecords;
+    }
+
     public void StartReading(Guid inputId)
     {
         Task.Run(async () =>

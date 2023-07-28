@@ -58,6 +58,28 @@ public class AnalogInputService : IAnalogInputService
         }
     }
 
+    public async Task<List<InputRecordDto>> GetAllByUser(Guid id)
+    {
+        var user = await _userService.FindById(id);
+        if (user == null) throw new Exception("User doesn't exist.");
+        var inputRecords = new List<InputRecordDto>();
+
+        foreach (var input in user.AnalogInputs)
+        {
+            var device = await _deviceService.FindByIoAddress(input.IOAddress);
+            var analogInputRecord = new AnalogInputRecord
+            {
+                Id = new Guid(),
+                RecordedAt = DateTime.Now,
+                Value = device.Value,
+                AnalogInput = input
+            };
+            inputRecords.Add(new InputRecordDto(analogInputRecord, device));
+        }
+
+        return inputRecords;
+    }
+
     public void StartReading(Guid inputId)
     {
         Task.Run(async () =>
