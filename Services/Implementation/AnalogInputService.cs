@@ -147,7 +147,7 @@ public class AnalogInputService : IAnalogInputService
 
                 var title = "Tag '" + input.Id + "'";
                 var message = "Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit + 
-                              " at IO address: " + "'" + device.IOAddress + "'";
+                              " at IO address: " + "'" + device.IOAddress + "'.";
                 Console.WriteLine("Alarm: Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit);
                 
                 var recordedAt = DateTime.Now;
@@ -161,9 +161,8 @@ public class AnalogInputService : IAnalogInputService
                 await _alarmHub.Clients.All.ReceiveData(new AlarmNotificationDto
                 {
                     Priority = alarm.Priority,
-                    AlarmTime = recordedAt,
                     Title = title,
-                    Message = message
+                    Message = message + "\n" + recordedAt.ToString("HH:mm:ss dd/MM/yyyy")
                 });
             }
         }
