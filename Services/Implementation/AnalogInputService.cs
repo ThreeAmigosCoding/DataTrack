@@ -12,24 +12,33 @@ namespace DataTrack.Services.Implementation;
 public class AnalogInputService : IAnalogInputService
 {
     private readonly IAnalogInputRepository _analogInputRepository;
+    private readonly IAlarmRecordRepository _alarmRecordRepository;
+    
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
     private readonly IAnalogInputRecordService _analogInputRecordService;
+    
     private readonly IHubContext<InputHub, IInputClient> _inputHub;
-    private readonly IAlarmRecordRepository _alarmRecordRepository;
+    private readonly IHubContext<AlarmHub, IAlarmClient> _alarmHub;
 
-
-    public AnalogInputService(IAnalogInputRepository analogInputRepository, IDeviceService deviceService,
-        IUserService userService, IHubContext<InputHub, IInputClient> inputHub,
+    public AnalogInputService(
+        IAnalogInputRepository analogInputRepository,
+        IAlarmRecordRepository alarmRecordRepository,
+        IDeviceService deviceService,
         IAnalogInputRecordService analogInputRecordService,
-        IAlarmRecordRepository alarmRecordRepository)
+        IUserService userService, 
+        IHubContext<InputHub, IInputClient> inputHub,
+        IHubContext<AlarmHub, IAlarmClient> alarmHub)
     {
+        _analogInputRepository = analogInputRepository;
+        _alarmRecordRepository = alarmRecordRepository;
+        
         _userService = userService;
         _deviceService = deviceService;
-        _analogInputRepository = analogInputRepository;
         _analogInputRecordService = analogInputRecordService;
+        
         _inputHub = inputHub;
-        _alarmRecordRepository = alarmRecordRepository;
+        _alarmHub = alarmHub;
     }
 
     public async Task<AnalogInput> CreateAnalogInput(AnalogInputDto analogInputDto)
@@ -97,22 +106,23 @@ public class AnalogInputService : IAnalogInputService
                 if (!analogInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(analogInput.IOAddress);
 
+                var recordedValue = device.Value;
+                if (device.Value > analogInput.HighLimit)
+                    recordedValue = analogInput.HighLimit;
+                else if (device.Value < analogInput.LowLimit)
+                    recordedValue = analogInput.LowLimit;
+                
                 AnalogInputRecord inputRecord = new AnalogInputRecord
                 {
                     RecordedAt = DateTime.Now,
                     AnalogInput = analogInput,
-                    // TODO: pretvoriti u odgovarajuci unit
-                    Value = device.Value
+                    // TODO: unit conversion
+                    Value = recordedValue
                 };
                 inputRecord = await _analogInputRecordService.Create(inputRecord);
                 
                 Alarm(analogInput, device);
 
-                if (device.Value > analogInput.HighLimit)
-                    Console.WriteLine("High limit reached");
-                else if (device.Value < analogInput.LowLimit)
-                    Console.WriteLine("Low limit reached");
-                
                 Console.WriteLine("Tag Scanning -> " + "Device Name: " + device.Name + "; Value: " + device.Value);
                 InputRecordDto inputRecordDto = new InputRecordDto(inputRecord, device);
                 await _inputHub.Clients.All
@@ -124,31 +134,36 @@ public class AnalogInputService : IAnalogInputService
         });
     }
 
-    private void Alarm(AnalogInput input, Device device)
+    // TODO: alarm logs
+    private async void Alarm(AnalogInput input, Device device)
     {
         var alarms = input.Alarms;
         foreach (var alarm in alarms)
         {
-            if (alarm.Type == AlarmType.LOW && device.Value < alarm.EdgeValue)
+            if (alarm.Type == AlarmType.LOW && device.Value < alarm.EdgeValue ||
+                alarm.Type == AlarmType.HIGH && device.Value > alarm.EdgeValue)
             {
-                Console.WriteLine("Alarm: Tag on device '" + device.Name + 
-                                  "' dropped below " + alarm.EdgeValue + " " + alarm.Unit);
-                _alarmRecordRepository.Create(new AlarmRecord
+                var messageType = alarm.Type == AlarmType.HIGH ? "' surpassed " : "' dropped below ";
+
+                var title = "Tag '" + input.Id + "'";
+                var message = "Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit + 
+                              " at IO address: " + "'" + device.IOAddress + "'";
+                Console.WriteLine("Alarm: Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit);
+                
+                var recordedAt = DateTime.Now;
+                await _alarmRecordRepository.Create(new AlarmRecord
                 {
                     Alarm = alarm,
                     Value = device.Value,
-                    RecordedAt = DateTime.Now
+                    RecordedAt = recordedAt
                 });
-            }
-            else if (alarm.Type == AlarmType.HIGH && device.Value > alarm.EdgeValue)
-            {
-                Console.WriteLine("Alarm: Tag on device '" + device.Name + 
-                                  "' surpassed " + alarm.EdgeValue + " " + alarm.Unit);
-                _alarmRecordRepository.Create(new AlarmRecord
+
+                await _alarmHub.Clients.All.ReceiveData(new AlarmNotificationDto
                 {
-                    Alarm = alarm,
-                    Value = device.Value,
-                    RecordedAt = DateTime.Now
+                    Priority = alarm.Priority,
+                    AlarmTime = recordedAt,
+                    Title = title,
+                    Message = message
                 });
             }
         }

@@ -127,7 +127,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+# region Sockets
+
 app.MapHub<InputHub>("/socket/input");
+app.MapHub<AlarmHub>("/socket/alarm");
+
+# endregion
 
 var dbContextSeed = app.Services.GetRequiredService<DataBaseContextSeed>();
 dbContextSeed.Seed();

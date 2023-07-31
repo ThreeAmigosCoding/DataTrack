@@ -30,17 +30,7 @@ public class SimulationService : IHostedService
     {
         return Task.CompletedTask;
     }
-
-    // private void RunSimulation()
-    // {
-    //     Task.Run(async () =>
-    //     {
-    //        
-    //         
-    //     });
-    // }
-
-
+    
     private async void RunSimulation(CancellationToken cancellationToken)
     {
          var rand = new Random();
