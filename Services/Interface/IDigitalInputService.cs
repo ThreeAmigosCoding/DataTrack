@@ -7,4 +7,9 @@ public interface IDigitalInputService
 {
     Task<DigitalInput> CreateDigitalInput(DigitalInputDto digitalInputDto);
 
+    public void StartReadingAll();
+    
+    public Task<List<InputRecordDto>> GetAllByUser(Guid id);
+
+
 }

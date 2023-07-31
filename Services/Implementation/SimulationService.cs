@@ -6,16 +6,23 @@ namespace DataTrack.Services.Implementation;
 public class SimulationService : IHostedService
 {
     private readonly IDeviceService _deviceService;
+    private readonly IAnalogInputService _analogInputService;
+    private readonly IDigitalInputService _digitalInputService;
 
-     public SimulationService(IDeviceService deviceService)
+     public SimulationService(IDeviceService deviceService, IAnalogInputService analogInputService, 
+         IDigitalInputService digitalInputService)
      {
          _deviceService = deviceService;
+         _analogInputService = analogInputService;
+         _digitalInputService = digitalInputService;
      }
      
     public Task StartAsync(CancellationToken cancellationToken)
     {
         ScadaConfig.LoadScadaConfig();
-        RunSimulation();
+        _analogInputService.StartReadingAll();
+        _digitalInputService.StartReadingAll();
+        RunSimulation(cancellationToken);
         return Task.CompletedTask;
     }
 
@@ -24,12 +31,20 @@ public class SimulationService : IHostedService
         return Task.CompletedTask;
     }
 
-    private void RunSimulation()
+    // private void RunSimulation()
+    // {
+    //     Task.Run(async () =>
+    //     {
+    //        
+    //         
+    //     });
+    // }
+
+
+    private async void RunSimulation(CancellationToken cancellationToken)
     {
-        Task.Run(async () =>
-        {
-            var rand = new Random();
-            while (true)
+         var rand = new Random();
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var devices = await _deviceService.ReadAll();
     
@@ -86,11 +101,9 @@ public class SimulationService : IHostedService
     
                 await Task.Delay(ScadaConfig.updateFrequency);
             }
-            
-        });
     }
 
-    
+
     private static double Sine()
     {
         return 100 * Math.Sin((double)DateTime.Now.Second / 60 * Math.PI);

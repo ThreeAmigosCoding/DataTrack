@@ -12,16 +12,19 @@ public class DigitalInputService : IDigitalInputService
     private readonly IDigitalInputRepository _digitalInputRepository;
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
+    private readonly IDigitalInputRecordService _digitalInputRecordService;
     private readonly IHubContext<InputHub, IInputClient> _inputHub;
 
 
 
     public DigitalInputService(IDigitalInputRepository digitalInputRepository, IDeviceService deviceService, 
-        IUserService userService, IHubContext<InputHub, IInputClient> inputHub)
+        IUserService userService, IHubContext<InputHub, IInputClient> inputHub, 
+        IDigitalInputRecordService digitalInputRecordService)
     {
         _digitalInputRepository = digitalInputRepository;
         _deviceService = deviceService;
         _userService = userService;
+        _digitalInputRecordService = digitalInputRecordService;
         _inputHub = inputHub;
     }
 
@@ -42,6 +45,37 @@ public class DigitalInputService : IDigitalInputService
         StartReading(createdDigitalInput.Id);
         return createdDigitalInput;
     }
+    
+    public async void StartReadingAll()
+    {
+        List<DigitalInput> digitalInputs = (await _digitalInputRepository.ReadAll()).ToList();
+        foreach (DigitalInput digitalInput in digitalInputs)
+        {
+            StartReading(digitalInput.Id);
+        }
+    }
+
+    public async Task<List<InputRecordDto>> GetAllByUser(Guid id)
+    {
+        var user = await _userService.FindById(id);
+        if (user == null) throw new Exception("User doesn't exist.");
+        var inputRecords = new List<InputRecordDto>();
+
+        foreach (var input in user.DigitalInputs)
+        {
+            var device = await _deviceService.FindByIoAddress(input.IOAddress);
+            var digitalInputRecord = new DigitalInputRecord
+            {
+                Id = new Guid(),
+                RecordedAt = DateTime.Now,
+                Value = device.Value,
+                DigitalInput = input
+            };
+            inputRecords.Add(new InputRecordDto(digitalInputRecord, device));
+        }
+
+        return inputRecords;
+    }
 
     public void StartReading(Guid inputId)
     {
@@ -53,9 +87,20 @@ public class DigitalInputService : IDigitalInputService
                 
                 if (!digitalInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(digitalInput.IOAddress);
-                Console.WriteLine("Device Name: " + device.Name + "; Value: " + device.Value);
+
+                DigitalInputRecord digitalInputRecord = new DigitalInputRecord
+                {
+                    DigitalInput = digitalInput,
+                    RecordedAt = DateTime.Now,
+                    //TODO: pretvoriti u odgovarajuci unit
+                    Value = device.Value
+                };
+                digitalInputRecord = await _digitalInputRecordService.Create(digitalInputRecord);
+                
+                Console.WriteLine("Tag Scanning -> " + "Device Name: " + device.Name + "; Value: " + device.Value);
+                InputRecordDto inputRecordDto = new InputRecordDto(digitalInputRecord, device);
                 await _inputHub.Clients.All
-                    .ReceiveDigitalData(new ResponseMessageDto("Device Name: " + device.Name + "; Value: " + device.Value));
+                    .ReceiveData(inputRecordDto);
 
                 await Task.Delay(digitalInput.ScanTime);
                 

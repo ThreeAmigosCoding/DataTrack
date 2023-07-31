@@ -23,6 +23,8 @@ public class User : IBaseEntity
 
     public User()
     {
+        AnalogInputs = new List<AnalogInput>();
+        DigitalInputs = new List<DigitalInput>();
     }
 
     public User(Guid id, string firstName, string lastName, string email, string password, 

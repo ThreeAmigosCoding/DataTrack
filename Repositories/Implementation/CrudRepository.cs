@@ -24,7 +24,7 @@ public class CrudRepository<T> : ICrudRepository<T> where T : class, IBaseEntity
         IEnumerable<T> data;
         try
         {
-            data = _entities.ToList();
+            data = await _entities.ToListAsync();
         }
         finally
         {
@@ -39,7 +39,7 @@ public class CrudRepository<T> : ICrudRepository<T> where T : class, IBaseEntity
         T data;
         try
         {
-            data = _entities.FirstOrDefault(e => e.Id == id);
+            data = await _entities.FirstOrDefaultAsync(e => e.Id == id);
         }
         finally
         {
@@ -55,7 +55,7 @@ public class CrudRepository<T> : ICrudRepository<T> where T : class, IBaseEntity
         try
         {
             _entities.Add(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             await Task.Delay(1);
         }
         finally
@@ -73,11 +73,11 @@ public class CrudRepository<T> : ICrudRepository<T> where T : class, IBaseEntity
 
         try
         {
-            entityToUpdate = _entities.FirstOrDefault(e => e.Id == entity.Id);
+            entityToUpdate = await _entities.FirstOrDefaultAsync(e => e.Id == entity.Id);
             if (entityToUpdate != null)
             {
                 _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 await Task.Delay(1);
             }
         }
@@ -96,11 +96,11 @@ public class CrudRepository<T> : ICrudRepository<T> where T : class, IBaseEntity
 
         try
         {
-            entityToDelete=_entities.FirstOrDefault(e => e.Id == id);
+            entityToDelete= await _entities.FirstOrDefaultAsync(e => e.Id == id);
             if (entityToDelete != null)
             {
                 _context.Remove(entityToDelete);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 await Task.Delay(1);
             }
         }

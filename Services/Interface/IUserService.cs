@@ -10,4 +10,6 @@ public interface IUserService
     public Task<string> Login(LoginDto loginDto);
 
     public Task<List<User>> FindUsersByAdmin(Guid adminId);
+
+    public Task<User> FindById(Guid id);
 }

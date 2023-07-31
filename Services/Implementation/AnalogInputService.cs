@@ -12,15 +12,18 @@ public class AnalogInputService : IAnalogInputService
     private readonly IAnalogInputRepository _analogInputRepository;
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
+    private readonly IAnalogInputRecordService _analogInputRecordService;
     private readonly IHubContext<InputHub, IInputClient> _inputHub;
 
 
     public AnalogInputService(IAnalogInputRepository analogInputRepository, IDeviceService deviceService,
-        IUserService userService, IHubContext<InputHub, IInputClient> inputHub)
+        IUserService userService, IHubContext<InputHub, IInputClient> inputHub,
+        IAnalogInputRecordService analogInputRecordService)
     {
         _userService = userService;
         _deviceService = deviceService;
         _analogInputRepository = analogInputRepository;
+        _analogInputRecordService = analogInputRecordService;
         _inputHub = inputHub;
     }
 
@@ -46,10 +49,42 @@ public class AnalogInputService : IAnalogInputService
         return createdAnalogInput;
     }
 
+    public async void StartReadingAll()
+    {
+        List<AnalogInput> analogInputs = (await _analogInputRepository.ReadAll()).ToList();
+        foreach (AnalogInput analogInput in analogInputs)
+        {
+            StartReading(analogInput.Id);
+        }
+    }
+
+    public async Task<List<InputRecordDto>> GetAllByUser(Guid id)
+    {
+        var user = await _userService.FindById(id);
+        if (user == null) throw new Exception("User doesn't exist.");
+        var inputRecords = new List<InputRecordDto>();
+
+        foreach (var input in user.AnalogInputs)
+        {
+            var device = await _deviceService.FindByIoAddress(input.IOAddress);
+            var analogInputRecord = new AnalogInputRecord
+            {
+                Id = new Guid(),
+                RecordedAt = DateTime.Now,
+                Value = device.Value,
+                AnalogInput = input
+            };
+            inputRecords.Add(new InputRecordDto(analogInputRecord, device));
+        }
+
+        return inputRecords;
+    }
+
     public void StartReading(Guid inputId)
     {
         Task.Run(async () =>
         {
+            
             while (true)
             {
                 AnalogInput analogInput = await _analogInputRepository.Read(inputId);
@@ -57,15 +92,25 @@ public class AnalogInputService : IAnalogInputService
                 if (!analogInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(analogInput.IOAddress);
 
+                AnalogInputRecord inputRecord = new AnalogInputRecord
+                {
+                    RecordedAt = DateTime.Now,
+                    AnalogInput = analogInput,
+                    //TODO: pretvoriti u odgovarajuci unit
+                    Value = device.Value
+                };
+                inputRecord = await _analogInputRecordService.Create(inputRecord);
+
                 //TODO: ovde alarmi 
                 if (device.Value > analogInput.HighLimit)
                     Console.WriteLine("High limit reached");
                 else if (device.Value < analogInput.LowLimit)
                     Console.WriteLine("Low limit reached");
                 
-                Console.WriteLine("Device Name: " + device.Name + "; Value: " + device.Value);
+                Console.WriteLine("Tag Scanning -> " + "Device Name: " + device.Name + "; Value: " + device.Value);
+                InputRecordDto inputRecordDto = new InputRecordDto(inputRecord, device);
                 await _inputHub.Clients.All
-                    .ReceiveAnalogData(new ResponseMessageDto("Device Name: " + device.Name + "; Value: " + device.Value));
+                    .ReceiveData(inputRecordDto);
 
                 await Task.Delay(analogInput.ScanTime);
             }

@@ -51,4 +51,9 @@ public class UserService : IUserService
     {
         return await _userRepository.FindByAdminId(adminId);
     }
+
+    public async Task<User> FindById(Guid id)
+    {
+        return await _userRepository.FindById(id);
+    }
 }

@@ -10,13 +10,9 @@ public class InputHub : Hub<IInputClient>
     {
     }
     
-    public async Task SendAnalogDataToClients(ResponseMessageDto data)
+    public async Task SendDataToClients(InputRecordDto data)
     {
-        await Clients.All.ReceiveAnalogData(data);
+        await Clients.All.ReceiveData(data);
     }
-
-    public async Task SendDigitalDataToClients(ResponseMessageDto data)
-    {
-        await Clients.All.ReceiveDigitalData(data);
-    }
+    
 }

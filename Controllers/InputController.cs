@@ -20,7 +20,7 @@ public class InputController : ControllerBase
         _digitalInputService = digitalInputService;
     }
 
-    // [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult> CreateAnalogInput([FromBody] AnalogInputDto analogInputDto)
     {
@@ -28,11 +28,25 @@ public class InputController : ControllerBase
         return Ok(new ResponseMessageDto("Analog Input created successfully."));
     }
     
-    // [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult> CreateDigitalInput([FromBody] DigitalInputDto digitalInputDto)
     {
         DigitalInput digitalInput = await _digitalInputService.CreateDigitalInput(digitalInputDto);
         return Ok(new ResponseMessageDto("Digital Input created successfully."));
+    }
+
+    //[Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult> GetAllUserInputs(Guid id)
+    {
+        try
+        {
+            return Ok((await _analogInputService.GetAllByUser(id)).Concat(await _digitalInputService.GetAllByUser(id)));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new ResponseMessageDto(e.StackTrace));
+        }
     }
 }
