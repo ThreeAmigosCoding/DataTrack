@@ -75,6 +75,7 @@ builder.Services.AddSingleton<IAnalogInputRepository, AnalogInputRepository>();
 builder.Services.AddSingleton<IDigitalInputRepository, DigitalInputRepository>();
 builder.Services.AddSingleton<IAnalogInputRecordRepository, AnalogInputRecordRepository>();
 builder.Services.AddSingleton<IDigitalInputRecordRepository, DigitalInputRecordRepository>();
+builder.Services.AddSingleton<IAlarmRepository, AlarmRepository>();
 
 # endregion
 
@@ -86,6 +87,7 @@ builder.Services.AddSingleton<IAnalogInputService, AnalogInputService>();
 builder.Services.AddSingleton<IDigitalInputService, DigitalInputService>();
 builder.Services.AddSingleton<IAnalogInputRecordService, AnalogInputRecordService>();
 builder.Services.AddSingleton<IDigitalInputRecordService, DigitalInputRecordService>();
+builder.Services.AddSingleton<IAlarmService, AlarmService>();
 
 builder.Services.AddHostedService<SimulationService>();
 
