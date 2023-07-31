@@ -238,10 +238,36 @@ namespace DataTrack.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "AlarmRecords",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    AlarmId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Value = table.Column<double>(type: "double", nullable: false),
+                    RecordedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AlarmRecords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AlarmRecords_Alarm_AlarmId",
+                        column: x => x.AlarmId,
+                        principalTable: "Alarm",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Alarm_AnalogInputId",
                 table: "Alarm",
                 column: "AnalogInputId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AlarmRecords_AlarmId",
+                table: "AlarmRecords",
+                column: "AlarmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AnalogInputRecord_AnalogInputId",
@@ -279,7 +305,7 @@ namespace DataTrack.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Alarm");
+                name: "AlarmRecords");
 
             migrationBuilder.DropTable(
                 name: "AnalogInputRecord");
@@ -303,13 +329,16 @@ namespace DataTrack.Migrations
                 name: "UsersDigitalInputs");
 
             migrationBuilder.DropTable(
-                name: "AnalogInput");
+                name: "Alarm");
 
             migrationBuilder.DropTable(
                 name: "DigitalInput");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "AnalogInput");
         }
     }
 }

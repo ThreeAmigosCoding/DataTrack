@@ -76,6 +76,7 @@ builder.Services.AddSingleton<IDigitalInputRepository, DigitalInputRepository>()
 builder.Services.AddSingleton<IAnalogInputRecordRepository, AnalogInputRecordRepository>();
 builder.Services.AddSingleton<IDigitalInputRecordRepository, DigitalInputRecordRepository>();
 builder.Services.AddSingleton<IAlarmRepository, AlarmRepository>();
+builder.Services.AddSingleton<IAlarmRecordRepository, AlarmRecordRepository>();
 
 # endregion
 

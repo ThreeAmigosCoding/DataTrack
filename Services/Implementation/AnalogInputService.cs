@@ -1,5 +1,7 @@
-﻿using DataTrack.Dto;
+﻿using DataTrack.Config;
+using DataTrack.Dto;
 using DataTrack.Model;
+using DataTrack.Model.Utils;
 using DataTrack.Repositories.Interface;
 using DataTrack.Services.Interface;
 using DataTrack.WebSocketConfig;
@@ -14,17 +16,20 @@ public class AnalogInputService : IAnalogInputService
     private readonly IUserService _userService;
     private readonly IAnalogInputRecordService _analogInputRecordService;
     private readonly IHubContext<InputHub, IInputClient> _inputHub;
+    private readonly IAlarmRecordRepository _alarmRecordRepository;
 
 
     public AnalogInputService(IAnalogInputRepository analogInputRepository, IDeviceService deviceService,
         IUserService userService, IHubContext<InputHub, IInputClient> inputHub,
-        IAnalogInputRecordService analogInputRecordService)
+        IAnalogInputRecordService analogInputRecordService,
+        IAlarmRecordRepository alarmRecordRepository)
     {
         _userService = userService;
         _deviceService = deviceService;
         _analogInputRepository = analogInputRepository;
         _analogInputRecordService = analogInputRecordService;
         _inputHub = inputHub;
+        _alarmRecordRepository = alarmRecordRepository;
     }
 
     public async Task<AnalogInput> CreateAnalogInput(AnalogInputDto analogInputDto)
@@ -80,14 +85,14 @@ public class AnalogInputService : IAnalogInputService
         return inputRecords;
     }
 
-    public void StartReading(Guid inputId)
+    private void StartReading(Guid inputId)
     {
         Task.Run(async () =>
         {
             
             while (true)
             {
-                AnalogInput analogInput = await _analogInputRepository.Read(inputId);
+                AnalogInput analogInput = await _analogInputRepository.FindById(inputId);
                 
                 if (!analogInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(analogInput.IOAddress);
@@ -96,12 +101,13 @@ public class AnalogInputService : IAnalogInputService
                 {
                     RecordedAt = DateTime.Now,
                     AnalogInput = analogInput,
-                    //TODO: pretvoriti u odgovarajuci unit
+                    // TODO: pretvoriti u odgovarajuci unit
                     Value = device.Value
                 };
                 inputRecord = await _analogInputRecordService.Create(inputRecord);
+                
+                Alarm(analogInput, device);
 
-                //TODO: ovde alarmi 
                 if (device.Value > analogInput.HighLimit)
                     Console.WriteLine("High limit reached");
                 else if (device.Value < analogInput.LowLimit)
@@ -116,5 +122,35 @@ public class AnalogInputService : IAnalogInputService
             }
             
         });
+    }
+
+    private void Alarm(AnalogInput input, Device device)
+    {
+        var alarms = input.Alarms;
+        foreach (var alarm in alarms)
+        {
+            if (alarm.Type == AlarmType.LOW && device.Value < alarm.EdgeValue)
+            {
+                Console.WriteLine("Alarm: Tag on device '" + device.Name + 
+                                  "' dropped below " + alarm.EdgeValue + " " + alarm.Unit);
+                _alarmRecordRepository.Create(new AlarmRecord
+                {
+                    Alarm = alarm,
+                    Value = device.Value,
+                    RecordedAt = DateTime.Now
+                });
+            }
+            else if (alarm.Type == AlarmType.HIGH && device.Value > alarm.EdgeValue)
+            {
+                Console.WriteLine("Alarm: Tag on device '" + device.Name + 
+                                  "' surpassed " + alarm.EdgeValue + " " + alarm.Unit);
+                _alarmRecordRepository.Create(new AlarmRecord
+                {
+                    Alarm = alarm,
+                    Value = device.Value,
+                    RecordedAt = DateTime.Now
+                });
+            }
+        }
     }
 }

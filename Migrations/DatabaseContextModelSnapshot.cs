@@ -48,6 +48,28 @@ namespace DataTrack.Migrations
                     b.ToTable("Alarm");
                 });
 
+            modelBuilder.Entity("DataTrack.Model.AlarmRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AlarmId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlarmId");
+
+                    b.ToTable("AlarmRecords");
+                });
+
             modelBuilder.Entity("DataTrack.Model.AnalogInput", b =>
                 {
                     b.Property<Guid>("Id")
@@ -315,6 +337,17 @@ namespace DataTrack.Migrations
                         .IsRequired();
 
                     b.Navigation("AnalogInput");
+                });
+
+            modelBuilder.Entity("DataTrack.Model.AlarmRecord", b =>
+                {
+                    b.HasOne("DataTrack.Model.Alarm", "Alarm")
+                        .WithMany()
+                        .HasForeignKey("AlarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Alarm");
                 });
 
             modelBuilder.Entity("DataTrack.Model.AnalogInputRecord", b =>
