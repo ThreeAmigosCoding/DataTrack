@@ -151,13 +151,15 @@ public class AnalogInputService : IAnalogInputService
                 Console.WriteLine("Alarm: Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit);
                 
                 var recordedAt = DateTime.Now;
-                await _alarmRecordRepository.Create(new AlarmRecord
+                var alarmRecord = await _alarmRecordRepository.Create(new AlarmRecord
                 {
                     Alarm = alarm,
                     Value = device.Value,
                     RecordedAt = recordedAt
                 });
 
+                LogAlarm(alarmRecord, input);
+                
                 await _alarmHub.Clients.All.ReceiveData(new AlarmNotificationDto
                 {
                     AlarmId = alarm.Id,
@@ -168,4 +170,25 @@ public class AnalogInputService : IAnalogInputService
             }
         }
     }
+
+    private async void LogAlarm(AlarmRecord alarmRecord, AnalogInput input)
+    {
+        await ScadaConfig.logSemaphore.WaitAsync();
+
+        try
+        {
+            await using var outputFile = new StreamWriter("alarm.log", true);
+            await outputFile.WriteAsync(
+                "Alarm '" + alarmRecord.Alarm.Id + 
+                "' for input '" + input.Id + 
+                "' triggered for value of " + alarmRecord.Value + " " + alarmRecord.Alarm.Unit + 
+                " at " + alarmRecord.RecordedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                + "\n");
+        }
+        finally
+        {
+            ScadaConfig.logSemaphore.Release();
+        }
+    }
+    
 }
