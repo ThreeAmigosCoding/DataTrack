@@ -12,4 +12,6 @@ public interface IUserService
     public Task<List<User>> FindUsersByAdmin(Guid adminId);
 
     public Task<User> FindById(Guid id);
+
+    public Task<List<Guid>> FindAlarmIdsByUser(Guid userId);
 }

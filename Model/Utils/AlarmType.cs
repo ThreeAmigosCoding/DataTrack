@@ -2,6 +2,6 @@
 
 public enum AlarmType
 {
-    LOW,
-    HIGH
+    LOWER,
+    HIGHER
 }

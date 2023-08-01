@@ -140,10 +140,10 @@ public class AnalogInputService : IAnalogInputService
         var alarms = input.Alarms;
         foreach (var alarm in alarms)
         {
-            if (alarm.Type == AlarmType.LOW && device.Value < alarm.EdgeValue ||
-                alarm.Type == AlarmType.HIGH && device.Value > alarm.EdgeValue)
+            if (alarm.Type == AlarmType.LOWER && device.Value < alarm.EdgeValue ||
+                alarm.Type == AlarmType.HIGHER && device.Value > alarm.EdgeValue)
             {
-                var messageType = alarm.Type == AlarmType.HIGH ? "' surpassed " : "' dropped below ";
+                var messageType = alarm.Type == AlarmType.HIGHER ? "' surpassed " : "' dropped below ";
 
                 var title = "Tag '" + input.Id + "'";
                 var message = "Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit + 
@@ -160,6 +160,7 @@ public class AnalogInputService : IAnalogInputService
 
                 await _alarmHub.Clients.All.ReceiveData(new AlarmNotificationDto
                 {
+                    AlarmId = alarm.Id,
                     Priority = alarm.Priority,
                     Title = title,
                     Message = message + "\n" + recordedAt.ToString("HH:mm:ss dd/MM/yyyy")
