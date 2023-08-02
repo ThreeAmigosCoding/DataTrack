@@ -77,6 +77,13 @@ public class DigitalInputService : IDigitalInputService
         return inputRecords;
     }
 
+    public async Task<DigitalInput> SwitchDigitalInputState(Guid id)
+    {
+        DigitalInput digitalInput = await _digitalInputRepository.FindById(id);
+        digitalInput.ScanOn = !digitalInput.ScanOn;
+        return await _digitalInputRepository.Update(digitalInput);
+    }
+
     public void StartReading(Guid inputId)
     {
         Task.Run(async () =>

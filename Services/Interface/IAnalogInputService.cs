@@ -10,4 +10,6 @@ public interface IAnalogInputService
     public void StartReadingAll();
 
     public Task<List<InputRecordDto>> GetAllByUser(Guid id);
+
+    public Task<AnalogInput> SwitchAnalogInputState(Guid id);
 }

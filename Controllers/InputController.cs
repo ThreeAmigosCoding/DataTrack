@@ -49,4 +49,19 @@ public class InputController : ControllerBase
             return BadRequest(new ResponseMessageDto(e.StackTrace));
         }
     }
+    
+    
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> SwitchAnalogInputState(Guid id)
+    {
+        await _analogInputService.SwitchAnalogInputState(id);
+        return Ok(new ResponseMessageDto("Analog Input: " + id + " state changed successfully."));
+    }
+    
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> SwitchDigitalInputState(Guid id)
+    {
+        await _digitalInputService.SwitchDigitalInputState(id);
+        return Ok(new ResponseMessageDto("Digital Input: " + id + " state changed successfully."));
+    }
 }
