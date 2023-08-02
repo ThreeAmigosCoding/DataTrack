@@ -147,7 +147,7 @@ public class AnalogInputService : IAnalogInputService
 
                 var title = "Tag '" + input.Id + "'";
                 var message = "Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit + 
-                              " at IO address: " + "'" + device.IOAddress + "'.";
+                              "\nat IO address: " + "'" + device.IOAddress + "'.";
                 Console.WriteLine("Alarm: Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit);
                 
                 var recordedAt = DateTime.Now;
@@ -182,7 +182,7 @@ public class AnalogInputService : IAnalogInputService
                 "Alarm '" + alarmRecord.Alarm.Id + 
                 "' for input '" + input.Id + 
                 "' triggered for value of " + alarmRecord.Value + " " + alarmRecord.Alarm.Unit + 
-                " at " + alarmRecord.RecordedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                "at " + alarmRecord.RecordedAt.ToString("dd/MM/yyyy HH:mm:ss")
                 + "\n");
         }
         finally

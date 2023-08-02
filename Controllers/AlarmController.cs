@@ -19,7 +19,7 @@ public class AlarmController : ControllerBase
         _userService = userService;
     }
 
-    // [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult> CreateAlarm([FromBody] AlarmCreationDto alarmDto)
     {
