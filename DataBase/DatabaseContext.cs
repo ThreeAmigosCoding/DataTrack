@@ -8,18 +8,15 @@ public class DatabaseContext : DbContext
     
     public DbSet<Alarm> Alarm { get; set; }
     public DbSet<AnalogInput> AnalogInput { get; set; }
-    
     public DbSet<AnalogInputRecord> AnalogInputRecord { get; set; }
-    
     public DbSet<AnalogOutput> AnalogOutput { get; set; }
     public DbSet<DigitalInput> DigitalInput { get; set; }
-    
     public DbSet<DigitalInputRecord> DigitalInputRecord { get; set; }
-    
     public DbSet<DigitalOutput> DigitalOutput { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Device> Devices { get; set; }
-   
+    public DbSet<AlarmRecord> AlarmRecords { get; set; }
+
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options)
     {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230728151332_Initial")]
+    [Migration("20230731135135_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -49,6 +49,28 @@ namespace DataTrack.Migrations
                     b.HasIndex("AnalogInputId");
 
                     b.ToTable("Alarm");
+                });
+
+            modelBuilder.Entity("DataTrack.Model.AlarmRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AlarmId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlarmId");
+
+                    b.ToTable("AlarmRecords");
                 });
 
             modelBuilder.Entity("DataTrack.Model.AnalogInput", b =>
@@ -318,6 +340,17 @@ namespace DataTrack.Migrations
                         .IsRequired();
 
                     b.Navigation("AnalogInput");
+                });
+
+            modelBuilder.Entity("DataTrack.Model.AlarmRecord", b =>
+                {
+                    b.HasOne("DataTrack.Model.Alarm", "Alarm")
+                        .WithMany()
+                        .HasForeignKey("AlarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Alarm");
                 });
 
             modelBuilder.Entity("DataTrack.Model.AnalogInputRecord", b =>

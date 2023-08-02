@@ -1,5 +1,7 @@
-﻿using DataTrack.Dto;
+﻿using DataTrack.Config;
+using DataTrack.Dto;
 using DataTrack.Model;
+using DataTrack.Model.Utils;
 using DataTrack.Repositories.Interface;
 using DataTrack.Services.Interface;
 using DataTrack.WebSocketConfig;
@@ -10,21 +12,33 @@ namespace DataTrack.Services.Implementation;
 public class AnalogInputService : IAnalogInputService
 {
     private readonly IAnalogInputRepository _analogInputRepository;
+    private readonly IAlarmRecordRepository _alarmRecordRepository;
+    
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
     private readonly IAnalogInputRecordService _analogInputRecordService;
+    
     private readonly IHubContext<InputHub, IInputClient> _inputHub;
+    private readonly IHubContext<AlarmHub, IAlarmClient> _alarmHub;
 
-
-    public AnalogInputService(IAnalogInputRepository analogInputRepository, IDeviceService deviceService,
-        IUserService userService, IHubContext<InputHub, IInputClient> inputHub,
-        IAnalogInputRecordService analogInputRecordService)
+    public AnalogInputService(
+        IAnalogInputRepository analogInputRepository,
+        IAlarmRecordRepository alarmRecordRepository,
+        IDeviceService deviceService,
+        IAnalogInputRecordService analogInputRecordService,
+        IUserService userService, 
+        IHubContext<InputHub, IInputClient> inputHub,
+        IHubContext<AlarmHub, IAlarmClient> alarmHub)
     {
+        _analogInputRepository = analogInputRepository;
+        _alarmRecordRepository = alarmRecordRepository;
+        
         _userService = userService;
         _deviceService = deviceService;
-        _analogInputRepository = analogInputRepository;
         _analogInputRecordService = analogInputRecordService;
+        
         _inputHub = inputHub;
+        _alarmHub = alarmHub;
     }
 
     public async Task<AnalogInput> CreateAnalogInput(AnalogInputDto analogInputDto)
@@ -80,33 +94,35 @@ public class AnalogInputService : IAnalogInputService
         return inputRecords;
     }
 
-    public void StartReading(Guid inputId)
+    private void StartReading(Guid inputId)
     {
         Task.Run(async () =>
         {
             
             while (true)
             {
-                AnalogInput analogInput = await _analogInputRepository.Read(inputId);
+                AnalogInput analogInput = await _analogInputRepository.FindById(inputId);
                 
                 if (!analogInput.ScanOn) continue;
                 Device device = await _deviceService.FindByIoAddress(analogInput.IOAddress);
 
+                var recordedValue = device.Value;
+                if (device.Value > analogInput.HighLimit)
+                    recordedValue = analogInput.HighLimit;
+                else if (device.Value < analogInput.LowLimit)
+                    recordedValue = analogInput.LowLimit;
+                
                 AnalogInputRecord inputRecord = new AnalogInputRecord
                 {
                     RecordedAt = DateTime.Now,
                     AnalogInput = analogInput,
-                    //TODO: pretvoriti u odgovarajuci unit
-                    Value = device.Value
+                    // TODO: unit conversion
+                    Value = recordedValue
                 };
                 inputRecord = await _analogInputRecordService.Create(inputRecord);
-
-                //TODO: ovde alarmi 
-                if (device.Value > analogInput.HighLimit)
-                    Console.WriteLine("High limit reached");
-                else if (device.Value < analogInput.LowLimit)
-                    Console.WriteLine("Low limit reached");
                 
+                Alarm(analogInput, device);
+
                 Console.WriteLine("Tag Scanning -> " + "Device Name: " + device.Name + "; Value: " + device.Value);
                 InputRecordDto inputRecordDto = new InputRecordDto(inputRecord, device);
                 await _inputHub.Clients.All
@@ -117,4 +133,62 @@ public class AnalogInputService : IAnalogInputService
             
         });
     }
+
+    // TODO: alarm logs
+    private async void Alarm(AnalogInput input, Device device)
+    {
+        var alarms = input.Alarms;
+        foreach (var alarm in alarms)
+        {
+            if (alarm.Type == AlarmType.LOWER && device.Value < alarm.EdgeValue ||
+                alarm.Type == AlarmType.HIGHER && device.Value > alarm.EdgeValue)
+            {
+                var messageType = alarm.Type == AlarmType.HIGHER ? "' surpassed " : "' dropped below ";
+
+                var title = "Tag '" + input.Id + "'";
+                var message = "Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit + 
+                              "\nat IO address: " + "'" + device.IOAddress + "'.";
+                Console.WriteLine("Alarm: Device '" + device.Name + messageType + alarm.EdgeValue + " " + alarm.Unit);
+                
+                var recordedAt = DateTime.Now;
+                var alarmRecord = await _alarmRecordRepository.Create(new AlarmRecord
+                {
+                    Alarm = alarm,
+                    Value = device.Value,
+                    RecordedAt = recordedAt
+                });
+
+                LogAlarm(alarmRecord, input);
+                
+                await _alarmHub.Clients.All.ReceiveData(new AlarmNotificationDto
+                {
+                    AlarmId = alarm.Id,
+                    Priority = alarm.Priority,
+                    Title = title,
+                    Message = message + "\n" + recordedAt.ToString("HH:mm:ss dd/MM/yyyy")
+                });
+            }
+        }
+    }
+
+    private async void LogAlarm(AlarmRecord alarmRecord, AnalogInput input)
+    {
+        await ScadaConfig.logSemaphore.WaitAsync();
+
+        try
+        {
+            await using var outputFile = new StreamWriter("alarm.log", true);
+            await outputFile.WriteAsync(
+                "Alarm '" + alarmRecord.Alarm.Id + 
+                "' for input '" + input.Id + 
+                "' triggered for value of " + alarmRecord.Value + " " + alarmRecord.Alarm.Unit + 
+                "at " + alarmRecord.RecordedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                + "\n");
+        }
+        finally
+        {
+            ScadaConfig.logSemaphore.Release();
+        }
+    }
+    
 }

@@ -75,6 +75,8 @@ builder.Services.AddSingleton<IAnalogInputRepository, AnalogInputRepository>();
 builder.Services.AddSingleton<IDigitalInputRepository, DigitalInputRepository>();
 builder.Services.AddSingleton<IAnalogInputRecordRepository, AnalogInputRecordRepository>();
 builder.Services.AddSingleton<IDigitalInputRecordRepository, DigitalInputRecordRepository>();
+builder.Services.AddSingleton<IAlarmRepository, AlarmRepository>();
+builder.Services.AddSingleton<IAlarmRecordRepository, AlarmRecordRepository>();
 
 # endregion
 
@@ -86,6 +88,7 @@ builder.Services.AddSingleton<IAnalogInputService, AnalogInputService>();
 builder.Services.AddSingleton<IDigitalInputService, DigitalInputService>();
 builder.Services.AddSingleton<IAnalogInputRecordService, AnalogInputRecordService>();
 builder.Services.AddSingleton<IDigitalInputRecordService, DigitalInputRecordService>();
+builder.Services.AddSingleton<IAlarmService, AlarmService>();
 
 builder.Services.AddHostedService<SimulationService>();
 
@@ -124,7 +127,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+# region Sockets
+
 app.MapHub<InputHub>("/socket/input");
+app.MapHub<AlarmHub>("/socket/alarm");
+
+# endregion
 
 var dbContextSeed = app.Services.GetRequiredService<DataBaseContextSeed>();
 dbContextSeed.Seed();
