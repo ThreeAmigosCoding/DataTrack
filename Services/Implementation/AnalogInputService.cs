@@ -94,6 +94,13 @@ public class AnalogInputService : IAnalogInputService
         return inputRecords;
     }
 
+    public async Task<AnalogInput> SwitchAnalogInputState(Guid id)
+    {
+        AnalogInput analogInput = await _analogInputRepository.FindById(id);
+        analogInput.ScanOn = !analogInput.ScanOn;
+        return await _analogInputRepository.Update(analogInput);
+    }
+
     private void StartReading(Guid inputId)
     {
         Task.Run(async () =>
