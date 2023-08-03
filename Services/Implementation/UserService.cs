@@ -60,6 +60,7 @@ public class UserService : IUserService
     public async Task<List<Guid>> FindAlarmIdsByUser(Guid userId)
     {
         var inputs = (await _userRepository.FindById(userId)).AnalogInputs;
-        return (from input in inputs from alarm in input.Alarms select alarm.Id).ToList();
+        return (from input in inputs from alarm in input.Alarms.Where(a => a.Deleted == false) select alarm.Id)
+            .ToList();
     }
 }

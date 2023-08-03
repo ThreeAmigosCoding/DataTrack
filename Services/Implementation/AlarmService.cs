@@ -35,4 +35,11 @@ public class AlarmService : IAlarmService
         
         return newAlarm;
     }
+
+    public async Task<Alarm> DeleteAlarm(Guid id)
+    {
+        var alarm = await _alarmRepository.Read(id);
+        alarm.Deleted = true;
+        return await _alarmRepository.Update(alarm);
+    }
 }

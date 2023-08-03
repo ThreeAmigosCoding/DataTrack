@@ -12,11 +12,13 @@ public class AlarmController : ControllerBase
 {
     private readonly IAlarmService _alarmService;
     private readonly IUserService _userService;
+    private readonly IAnalogInputService _analogInputService;
     
-    public AlarmController(IAlarmService alarmService, IUserService userService)
+    public AlarmController(IAlarmService alarmService, IUserService userService, IAnalogInputService analogInputService)
     {
         _alarmService = alarmService;
         _userService = userService;
+        _analogInputService = analogInputService;
     }
 
     [Authorize(Policy = IdentityData.AdminUserPolicyName)]
@@ -40,7 +42,36 @@ public class AlarmController : ControllerBase
     {
         try
         {
-            return Ok((await _userService.FindAlarmIdsByUser(id)));
+            return Ok(await _userService.FindAlarmIdsByUser(id));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new ResponseMessageDto(e.Message));
+        }
+    }
+    
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpGet("{inputId:guid}")]
+    public async Task<ActionResult> GetAllInputAlarms(Guid inputId)
+    {
+        try
+        {
+            return Ok(await _analogInputService.GetAlarms(inputId));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new ResponseMessageDto(e.Message));
+        }
+    }
+    
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteAlarm(Guid id)
+    {
+        try
+        {
+            await _alarmService.DeleteAlarm(id);
+            return Ok(new ResponseMessageDto("Alarm deleted successfully"));
         }
         catch (Exception e)
         {

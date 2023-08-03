@@ -28,6 +28,9 @@ namespace DataTrack.Migrations
                     b.Property<Guid>("AnalogInputId")
                         .HasColumnType("char(36)");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<double>("EdgeValue")
                         .HasColumnType("double");
 

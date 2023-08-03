@@ -36,7 +36,7 @@ public class InputController : ControllerBase
         return Ok(new ResponseMessageDto("Digital Input created successfully."));
     }
 
-    //[Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetAllUserInputs(Guid id)
     {
@@ -50,7 +50,7 @@ public class InputController : ControllerBase
         }
     }
     
-    
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> SwitchAnalogInputState(Guid id)
     {
@@ -58,6 +58,7 @@ public class InputController : ControllerBase
         return Ok(new ResponseMessageDto("Analog Input: " + id + " state changed successfully."));
     }
     
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> SwitchDigitalInputState(Guid id)
     {
