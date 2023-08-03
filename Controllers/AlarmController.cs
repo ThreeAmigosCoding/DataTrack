@@ -1,5 +1,6 @@
 ﻿using DataTrack.Auth;
 using DataTrack.Dto;
+using DataTrack.Model.Utils;
 using DataTrack.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -79,13 +80,27 @@ public class AlarmController : ControllerBase
         }
     }
     
-    // [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpGet]
     public async Task<ActionResult> GetAlarmRecordsByTime([FromBody] DateRangeDto dateRange)
     {
         try
         {
             return Ok(await _alarmService.GetAlarmRecordsByTime(dateRange));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new ResponseMessageDto(e.Message));
+        }
+    }
+    
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpGet]
+    public async Task<ActionResult> GetAlarmRecordsByPriority([FromQuery] AlarmPriority priority)
+    {
+        try
+        {
+            return Ok(await _alarmService.GetAlarmRecordsByPriority(priority));
         }
         catch (Exception e)
         {

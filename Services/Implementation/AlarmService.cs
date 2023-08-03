@@ -1,5 +1,6 @@
 ﻿using DataTrack.Dto;
 using DataTrack.Model;
+using DataTrack.Model.Utils;
 using DataTrack.Repositories.Interface;
 using DataTrack.Services.Interface;
 
@@ -49,7 +50,17 @@ public class AlarmService : IAlarmService
     public async Task<List<AlarmRecordDto>> GetAlarmRecordsByTime(DateRangeDto dateRange)
     {
         var records = (await _alarmRecordRepository.ReadAll())
-            .Where(a => dateRange.IsDateInRange(a.RecordedAt)).ToList();
+            .Where(a => dateRange.IsDateInRange(a.RecordedAt))
+            .OrderByDescending(a => a.Alarm.Priority).ThenByDescending(a => a.RecordedAt);
         return records.Select(r => new AlarmRecordDto(r)).ToList();
+    }
+
+    public async Task<List<AlarmRecordDto>> GetAlarmRecordsByPriority(AlarmPriority priority)
+    {
+        var records = (await _alarmRecordRepository.ReadAll())
+            .Where(a => a.Alarm.Priority == priority).OrderByDescending(a => a.RecordedAt);
+        
+        return records.Select(r => new AlarmRecordDto(r)).ToList();
+        
     }
 }
