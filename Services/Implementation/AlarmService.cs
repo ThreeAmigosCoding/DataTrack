@@ -9,11 +9,14 @@ public class AlarmService : IAlarmService
 {
     private readonly IAlarmRepository _alarmRepository;
     private readonly IAnalogInputRepository _analogInputRepository;
+    private readonly IAlarmRecordRepository _alarmRecordRepository;
 
-    public AlarmService(IAlarmRepository alarmRepository, IAnalogInputRepository analogInputRepository)
+    public AlarmService(IAlarmRepository alarmRepository, IAnalogInputRepository analogInputRepository, 
+        IAlarmRecordRepository alarmRecordRepository)
     {
         _alarmRepository = alarmRepository;
         _analogInputRepository = analogInputRepository;
+        _alarmRecordRepository = alarmRecordRepository;
     }
 
     public async Task<Alarm> CreateAlarm(AlarmCreationDto alarmCreationDto)
@@ -41,5 +44,12 @@ public class AlarmService : IAlarmService
         var alarm = await _alarmRepository.Read(id);
         alarm.Deleted = true;
         return await _alarmRepository.Update(alarm);
+    }
+
+    public async Task<List<AlarmRecordDto>> GetAlarmRecordsByTime(DateRangeDto dateRange)
+    {
+        var records = (await _alarmRecordRepository.ReadAll())
+            .Where(a => dateRange.IsDateInRange(a.RecordedAt)).ToList();
+        return records.Select(r => new AlarmRecordDto(r)).ToList();
     }
 }

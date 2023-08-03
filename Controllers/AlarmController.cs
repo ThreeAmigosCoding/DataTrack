@@ -78,4 +78,18 @@ public class AlarmController : ControllerBase
             return BadRequest(new ResponseMessageDto(e.Message));
         }
     }
+    
+    // [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpGet]
+    public async Task<ActionResult> GetAlarmRecordsByTime([FromBody] DateRangeDto dateRange)
+    {
+        try
+        {
+            return Ok(await _alarmService.GetAlarmRecordsByTime(dateRange));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new ResponseMessageDto(e.Message));
+        }
+    }
 }
