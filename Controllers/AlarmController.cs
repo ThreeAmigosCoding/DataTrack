@@ -81,7 +81,7 @@ public class AlarmController : ControllerBase
     }
     
     [Authorize(Policy = IdentityData.AdminUserPolicyName)]
-    [HttpGet]
+    [HttpPut]
     public async Task<ActionResult> GetAlarmRecordsByTime([FromBody] DateRangeDto dateRange)
     {
         try
