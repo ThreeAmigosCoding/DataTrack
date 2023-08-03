@@ -101,6 +101,25 @@ public class AnalogInputService : IAnalogInputService
         return await _analogInputRepository.Update(analogInput);
     }
 
+    public async Task<List<AlarmDto>> GetAlarms(Guid inputId)
+    {
+        var input = await _analogInputRepository.FindById(inputId);
+        List<AlarmDto> alarms = new List<AlarmDto>();
+        foreach (var alarm in input.Alarms.Where(a => a.Deleted == false))
+        {
+            alarms.Add(new AlarmDto
+            { 
+                Id = alarm.Id,
+                Type = alarm.Type, 
+                Priority = alarm.Priority,
+                EdgeValue = alarm.EdgeValue,
+                Unit = alarm.Unit,
+                AnalogInputId = alarm.AnalogInput.Id
+            });
+        }
+        return alarms;
+    }
+
     private void StartReading(Guid inputId)
     {
         Task.Run(async () =>
@@ -141,10 +160,9 @@ public class AnalogInputService : IAnalogInputService
         });
     }
 
-    // TODO: alarm logs
     private async void Alarm(AnalogInput input, Device device)
     {
-        var alarms = input.Alarms;
+        var alarms = input.Alarms.Where(a => a.Deleted == false);
         foreach (var alarm in alarms)
         {
             if (alarm.Type == AlarmType.LOWER && device.Value < alarm.EdgeValue ||

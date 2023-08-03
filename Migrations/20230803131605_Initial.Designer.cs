@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230801145937_Initial")]
+    [Migration("20230803131605_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -30,6 +30,9 @@ namespace DataTrack.Migrations
 
                     b.Property<Guid>("AnalogInputId")
                         .HasColumnType("char(36)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<double>("EdgeValue")
                         .HasColumnType("double");

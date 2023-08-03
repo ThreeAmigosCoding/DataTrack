@@ -12,4 +12,7 @@ public interface IAnalogInputService
     public Task<List<InputRecordDto>> GetAllByUser(Guid id);
 
     public Task<AnalogInput> SwitchAnalogInputState(Guid id);
+    
+    public Task<List<AlarmDto>> GetAlarms(Guid inputId);
+
 }

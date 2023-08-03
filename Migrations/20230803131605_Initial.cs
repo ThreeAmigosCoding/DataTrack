@@ -132,7 +132,8 @@ namespace DataTrack.Migrations
                     Priority = table.Column<int>(type: "int", nullable: false),
                     EdgeValue = table.Column<double>(type: "double", nullable: false),
                     Unit = table.Column<string>(type: "longtext", nullable: false),
-                    AnalogInputId = table.Column<Guid>(type: "char(36)", nullable: false)
+                    AnalogInputId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,30 +1,27 @@
 ﻿using DataTrack.Model.Utils;
 
-namespace DataTrack.Model;
+namespace DataTrack.Dto;
 
-public class Alarm : IBaseEntity
+public class AlarmDto
 {
     public Guid Id { get; set; }
     public AlarmType Type { get; set; }
     public AlarmPriority Priority { get; set; }
     public double EdgeValue { get; set; }
     public string Unit { get; set; }
-    public AnalogInput AnalogInput { get; set; }
-    public bool Deleted { get; set; }
+    public Guid AnalogInputId { get; set; }
 
-    public Alarm()
+    public AlarmDto()
     {
     }
 
-    public Alarm(Guid id, AlarmType type, AlarmPriority priority, double edgeValue, 
-        string unit, AnalogInput analogInput, bool deleted)
+    public AlarmDto(Guid id, AlarmType type, AlarmPriority priority, double edgeValue, string unit, Guid analogInputId)
     {
         Id = id;
         Type = type;
         Priority = priority;
         EdgeValue = edgeValue;
         Unit = unit;
-        AnalogInput = analogInput;
-        Deleted = deleted;
+        AnalogInputId = analogInputId;
     }
 }

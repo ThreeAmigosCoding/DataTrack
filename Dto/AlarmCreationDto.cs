@@ -1,5 +1,4 @@
-﻿using DataTrack.Model;
-using DataTrack.Model.Utils;
+﻿using DataTrack.Model.Utils;
 
 namespace DataTrack.Dto;
 
