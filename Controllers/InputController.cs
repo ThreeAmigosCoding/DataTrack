@@ -74,6 +74,22 @@ public class InputController : ControllerBase
     }
 
     [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpGet]
+    public async Task<ActionResult> GetAllInputIds()
+    {
+        try
+        {
+            var analogInputIds = await _analogInputService.GetAllInputIds();
+            var digitalInputIds = await _digitalInputService.GetAllInputIds();
+            return Ok(analogInputIds.Concat(digitalInputIds));
+        }
+        catch (Exception e)
+        {
+            return NotFound(new ResponseMessageDto(e.StackTrace));
+        }
+    }
+    
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPut]
     public async Task<ActionResult> GetAllInputRecords([FromBody] DateRangeDto dateRange)
     {

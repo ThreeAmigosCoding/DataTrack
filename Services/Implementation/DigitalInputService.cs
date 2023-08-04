@@ -84,6 +84,11 @@ public class DigitalInputService : IDigitalInputService
         return await _digitalInputRepository.Update(digitalInput);
     }
 
+    public async Task<List<Guid>> GetAllInputIds()
+    {
+        return (await _digitalInputRepository.ReadAll()).Select(i => i.Id).ToList();
+    }
+
     public void StartReading(Guid inputId)
     {
         Task.Run(async () =>

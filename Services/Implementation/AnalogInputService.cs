@@ -120,6 +120,11 @@ public class AnalogInputService : IAnalogInputService
         return alarms;
     }
 
+    public async Task<List<Guid>> GetAllInputIds()
+    {
+        return (await _analogInputRepository.ReadAll()).Select(i => i.Id).ToList();
+    }
+
     private void StartReading(Guid inputId)
     {
         Task.Run(async () =>
