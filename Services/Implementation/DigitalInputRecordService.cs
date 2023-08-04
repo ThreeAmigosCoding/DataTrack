@@ -40,6 +40,7 @@ public class DigitalInputRecordService : IDigitalInputRecordService
     {
         var records = (await ReadAll()).Where(r => r.DigitalInput.Id == inputId)
             .ToList();
-        return records.Select(r => new InputRecordDto(r)).ToList();
+        return records.Select(r => new InputRecordDto(r)).OrderByDescending(r => r.RecordedAt)
+            .ToList();
     }
 }

@@ -40,6 +40,7 @@ public class AnalogInputRecordService : IAnalogInputRecordService
     {
         var records = (await ReadAll()).Where(r => r.AnalogInput.Id == inputId)
             .ToList();
-        return records.Select(r => new InputRecordDto(r)).ToList();
+        return records.Select(r => new InputRecordDto(r)).OrderByDescending(r => r.RecordedAt)
+            .ToList();
     }
 }
