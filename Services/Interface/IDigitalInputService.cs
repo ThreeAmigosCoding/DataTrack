@@ -12,5 +12,7 @@ public interface IDigitalInputService
     public Task<List<InputRecordDto>> GetAllByUser(Guid id);
 
     public Task<DigitalInput> SwitchDigitalInputState(Guid id);
-
+    
+    public Task<List<Guid>> GetAllInputIds();
+    
 }

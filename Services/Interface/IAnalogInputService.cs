@@ -15,4 +15,6 @@ public interface IAnalogInputService
     
     public Task<List<AlarmDto>> GetAlarms(Guid inputId);
 
+    public Task<List<Guid>> GetAllInputIds();
+
 }
