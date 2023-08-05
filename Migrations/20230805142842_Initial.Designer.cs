@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTrack.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230803131605_Initial")]
+    [Migration("20230805142842_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -149,6 +149,9 @@ namespace DataTrack.Migrations
                     b.Property<string>("IOAddress")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<double>("InitialValue")
+                        .HasColumnType("double");
 
                     b.Property<double>("LowLimit")
                         .HasColumnType("double");

@@ -42,7 +42,8 @@ namespace DataTrack.Migrations
                     IOAddress = table.Column<string>(type: "longtext", nullable: false),
                     LowLimit = table.Column<double>(type: "double", nullable: false),
                     HighLimit = table.Column<double>(type: "double", nullable: false),
-                    Unit = table.Column<string>(type: "longtext", nullable: false)
+                    Unit = table.Column<string>(type: "longtext", nullable: false),
+                    InitialValue = table.Column<double>(type: "double", nullable: false)
                 },
                 constraints: table =>
                 {

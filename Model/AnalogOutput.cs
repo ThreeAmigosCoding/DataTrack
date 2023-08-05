@@ -10,12 +10,15 @@ public class AnalogOutput : IBaseEntity
     public double LowLimit { get; set; }
     public double HighLimit { get; set; }
     public string Unit { get; set; }
+    
+    public double InitialValue { get; set; }
 
     public AnalogOutput()
     {
     }
 
-    public AnalogOutput(Guid id, string description, string ioAddress, double lowLimit, double highLimit, string unit)
+    public AnalogOutput(Guid id, string description, string ioAddress, double lowLimit, double highLimit, string unit,
+        double initialValue)
     {
         Id = id;
         Description = description;
@@ -23,5 +26,6 @@ public class AnalogOutput : IBaseEntity
         LowLimit = lowLimit;
         HighLimit = highLimit;
         Unit = unit;
+        InitialValue = initialValue;
     }
 }

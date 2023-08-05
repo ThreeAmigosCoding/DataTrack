@@ -10,21 +10,32 @@ namespace DataTrack.Services.Implementation;
 public class DigitalInputService : IDigitalInputService
 {
     private readonly IDigitalInputRepository _digitalInputRepository;
+    private readonly IDigitalOutputRepository _digitalOutputRepository;
+    
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
     private readonly IDigitalInputRecordService _digitalInputRecordService;
+    
     private readonly IHubContext<InputHub, IInputClient> _inputHub;
 
 
 
-    public DigitalInputService(IDigitalInputRepository digitalInputRepository, IDeviceService deviceService, 
-        IUserService userService, IHubContext<InputHub, IInputClient> inputHub, 
-        IDigitalInputRecordService digitalInputRecordService)
+    public DigitalInputService(
+        IDigitalInputRepository digitalInputRepository,
+        IDigitalOutputRepository digitalOutputRepository,
+        IDeviceService deviceService, 
+        IUserService userService,
+        IDigitalInputRecordService digitalInputRecordService,
+        IHubContext<InputHub, IInputClient> inputHub
+        )
     {
         _digitalInputRepository = digitalInputRepository;
+        _digitalOutputRepository = digitalOutputRepository;
+        
         _deviceService = deviceService;
         _userService = userService;
         _digitalInputRecordService = digitalInputRecordService;
+        
         _inputHub = inputHub;
     }
 
@@ -40,8 +51,15 @@ public class DigitalInputService : IDigitalInputService
             ScanOn = true,
             Users = users
         };
+        DigitalOutput digitalOutput = new DigitalOutput
+        {
+            Description = digitalInputDto.Description,
+            InitialValue = 0,
+            IOAddress = device.IOAddress
+        };
 
         DigitalInput createdDigitalInput = await _digitalInputRepository.Create(digitalInput);
+        await _digitalOutputRepository.Create(digitalOutput);
         StartReading(createdDigitalInput.Id);
         return createdDigitalInput;
     }

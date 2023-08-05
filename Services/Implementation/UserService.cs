@@ -23,14 +23,18 @@ public class UserService : IUserService
             throw new Exception("User already registered");
         }
 
+        var admin = await _userRepository.FindByEmail(registeredBy);
+        
         var user = new User
         {
             Email = userDto.Email,
             FirstName = userDto.FirstName,
             LastName = userDto.LastName,
             Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
-            RegisteredBy = await _userRepository.FindByEmail(registeredBy),
-            Admin = false
+            RegisteredBy = admin,
+            Admin = false,
+            AnalogInputs = admin.AnalogInputs,
+            DigitalInputs = admin.DigitalInputs
         };
 
         return await _userRepository.Create(user);
