@@ -12,6 +12,7 @@ namespace DataTrack.Services.Implementation;
 public class AnalogInputService : IAnalogInputService
 {
     private readonly IAnalogInputRepository _analogInputRepository;
+    private readonly IAnalogOutputRepository _analogOutputRepository;
     private readonly IAlarmRecordRepository _alarmRecordRepository;
     
     private readonly IDeviceService _deviceService;
@@ -23,6 +24,7 @@ public class AnalogInputService : IAnalogInputService
 
     public AnalogInputService(
         IAnalogInputRepository analogInputRepository,
+        IAnalogOutputRepository analogOutputRepository,
         IAlarmRecordRepository alarmRecordRepository,
         IDeviceService deviceService,
         IAnalogInputRecordService analogInputRecordService,
@@ -31,6 +33,7 @@ public class AnalogInputService : IAnalogInputService
         IHubContext<AlarmHub, IAlarmClient> alarmHub)
     {
         _analogInputRepository = analogInputRepository;
+        _analogOutputRepository = analogOutputRepository;
         _alarmRecordRepository = alarmRecordRepository;
         
         _userService = userService;
@@ -56,8 +59,18 @@ public class AnalogInputService : IAnalogInputService
             ScanOn = true,
             Users = users
         };
+        AnalogOutput analogOutput = new AnalogOutput
+        {
+            Description = analogInput.Description,
+            HighLimit = analogInput.HighLimit,
+            LowLimit = analogInput.LowLimit,
+            IOAddress = analogInput.IOAddress,
+            Unit = analogInput.Unit,
+            InitialValue = (analogInput.LowLimit + analogInput.HighLimit) / 2
+        };
         
         AnalogInput createdAnalogInput = await _analogInputRepository.Create(analogInput);
+        await _analogOutputRepository.Create(analogOutput);
         StartReading(createdAnalogInput.Id);
 
         return createdAnalogInput;

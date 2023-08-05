@@ -147,6 +147,9 @@ namespace DataTrack.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<double>("InitialValue")
+                        .HasColumnType("double");
+
                     b.Property<double>("LowLimit")
                         .HasColumnType("double");
 

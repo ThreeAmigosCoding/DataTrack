@@ -14,19 +14,20 @@ public class UserRepository : CrudRepository<User>, IUserRepository
 
     public async Task<User?> FindByEmail(string email)
     {
-        User user;
         await ScadaConfig.dbSemaphore.WaitAsync();
+
         try
         {
             await Task.Delay(1);
-            user = await _entities.FirstOrDefaultAsync(x => x.Email == email);
+            return await _entities
+                .Include(e => e.AnalogInputs).ThenInclude(e => e.Alarms)
+                .Include(e => e.DigitalInputs)
+                .FirstOrDefaultAsync(e => e.Email == email);
         }
         finally
         {
             ScadaConfig.dbSemaphore.Release();
         }
-        
-        return user;
         
     }
 
