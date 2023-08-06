@@ -10,13 +10,14 @@ public class DigitalInput : IBaseEntity
     public int ScanTime { get; set; }
     public bool ScanOn { get; set; }
     public List<User> Users { get; set; }
+    public bool Deleted { get; set; }
 
     public DigitalInput()
     {
     }
 
     public DigitalInput(Guid id, string description, string ioAddress, int scanTime,
-        bool scanOn, List<User> users)
+        bool scanOn, List<User> users, bool deleted)
     {
         Id = id;
         Description = description;
@@ -24,5 +25,6 @@ public class DigitalInput : IBaseEntity
         ScanTime = scanTime;
         ScanOn = scanOn;
         Users = users;
+        Deleted = deleted;
     }
 }

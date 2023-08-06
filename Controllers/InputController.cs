@@ -99,7 +99,7 @@ public class InputController : ControllerBase
         return Ok(analogInputRecordsDto.Concat(digitalInputRecordsDto).OrderByDescending(r => r.RecordedAt));
     }
     
-    //[Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpGet("{inputId:guid}")]
     public async Task<ActionResult> GetAllInputRecordsByInput(Guid inputId)
     {
@@ -107,5 +107,15 @@ public class InputController : ControllerBase
         if (recordDtos.IsNullOrEmpty())
             recordDtos = await _analogInputRecordService.GetAllByInput(inputId);
         return Ok(recordDtos);
+    }
+
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpDelete("{ioAddress}/{type}")]
+    public async Task<ActionResult> DeleteInput(string ioAddress, string type)
+    {
+        if (type.ToLower() == "digital") _digitalInputService.DeleteInput(ioAddress);
+        else  _analogInputService.DeleteInput(ioAddress);
+
+        return Ok(new ResponseMessageDto("Input deleted successfully"));
     }
 }

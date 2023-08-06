@@ -36,7 +36,7 @@ public class SimulationService : IHostedService
          var rand = new Random();
             while (!cancellationToken.IsCancellationRequested)
             {
-                var devices = await _deviceService.ReadAll();
+                var devices = (await _deviceService.ReadAll()).Where(d => !d.Deleted);
     
                 foreach (var device in devices)
                 {

@@ -15,4 +15,6 @@ public interface IDigitalInputService
     
     public Task<List<Guid>> GetAllInputIds();
     
+    public Task DeleteInput(string ioAddress);
+    
 }

@@ -17,4 +17,6 @@ public interface IAnalogInputService
 
     public Task<List<Guid>> GetAllInputIds();
 
+    public Task DeleteInput(string ioAddress);
+
 }

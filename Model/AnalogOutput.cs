@@ -12,13 +12,14 @@ public class AnalogOutput : IBaseEntity
     public string Unit { get; set; }
     
     public double InitialValue { get; set; }
+    public bool Deleted { get; set; }
 
     public AnalogOutput()
     {
     }
 
     public AnalogOutput(Guid id, string description, string ioAddress, double lowLimit, double highLimit, string unit,
-        double initialValue)
+        double initialValue, bool deleted)
     {
         Id = id;
         Description = description;
@@ -27,5 +28,6 @@ public class AnalogOutput : IBaseEntity
         HighLimit = highLimit;
         Unit = unit;
         InitialValue = initialValue;
+        Deleted = deleted;
     }
 }

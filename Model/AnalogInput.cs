@@ -15,11 +15,12 @@ public class AnalogInput : IBaseEntity
     public string Unit { get; set; }
     public List<Alarm> Alarms { get; set; }
     public List<User> Users { get; set; }
+    public bool Deleted { get; set; }
 
     public AnalogInput() { }
 
     public AnalogInput(Guid id, string description, string ioAddress, int scanTime, bool scanOn, 
-        double lowLimit, double highLimit, string unit, List<Alarm> alarms, List<User> users)
+        double lowLimit, double highLimit, string unit, List<Alarm> alarms, List<User> users, bool deleted)
     {
         Id = id;
         Description = description;
@@ -31,5 +32,6 @@ public class AnalogInput : IBaseEntity
         Unit = unit;
         Alarms = alarms;
         Users = users;
+        Deleted = deleted;
     }
 }

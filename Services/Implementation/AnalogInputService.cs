@@ -14,6 +14,7 @@ public class AnalogInputService : IAnalogInputService
     private readonly IAnalogInputRepository _analogInputRepository;
     private readonly IAnalogOutputRepository _analogOutputRepository;
     private readonly IAlarmRecordRepository _alarmRecordRepository;
+    private readonly IDeviceRepository _deviceRepository;
     
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
@@ -30,11 +31,14 @@ public class AnalogInputService : IAnalogInputService
         IAnalogInputRecordService analogInputRecordService,
         IUserService userService, 
         IHubContext<InputHub, IInputClient> inputHub,
-        IHubContext<AlarmHub, IAlarmClient> alarmHub)
+        IHubContext<AlarmHub, IAlarmClient> alarmHub,
+        IDeviceRepository deviceRepository)
+        
     {
         _analogInputRepository = analogInputRepository;
         _analogOutputRepository = analogOutputRepository;
         _alarmRecordRepository = alarmRecordRepository;
+        _deviceRepository = deviceRepository;
         
         _userService = userService;
         _deviceService = deviceService;
@@ -78,7 +82,7 @@ public class AnalogInputService : IAnalogInputService
 
     public async void StartReadingAll()
     {
-        List<AnalogInput> analogInputs = (await _analogInputRepository.ReadAll()).ToList();
+        List<AnalogInput> analogInputs = (await _analogInputRepository.ReadAll()).Where(a => !a.Deleted).ToList();
         foreach (AnalogInput analogInput in analogInputs)
         {
             StartReading(analogInput.Id);
@@ -93,6 +97,7 @@ public class AnalogInputService : IAnalogInputService
 
         foreach (var input in user.AnalogInputs)
         {
+            if (input.Deleted) continue;
             var device = await _deviceService.FindByIoAddress(input.IOAddress);
             var analogInputRecord = new AnalogInputRecord
             {
@@ -138,6 +143,25 @@ public class AnalogInputService : IAnalogInputService
         return (await _analogInputRepository.ReadAll()).Select(i => i.Id).ToList();
     }
 
+    public async Task DeleteInput(string ioAddress)
+    {
+        AnalogInput input = (await _analogInputRepository.ReadAll())
+            .FirstOrDefault(i => i.IOAddress == ioAddress);
+        input.Deleted = true;
+
+        Device device = await _deviceRepository.FindByIoAddress(ioAddress);
+        device.Deleted = true;
+        
+        AnalogOutput output = (await _analogOutputRepository.ReadAll())
+            .FirstOrDefault(o => o.IOAddress == ioAddress);
+        output.Deleted = true;
+        
+        await _analogInputRepository.Update(input);
+        await _deviceRepository.Update(device);
+        await _analogOutputRepository.Update(output);
+        
+    } 
+
     private void StartReading(Guid inputId)
     {
         Task.Run(async () =>
@@ -147,7 +171,7 @@ public class AnalogInputService : IAnalogInputService
             {
                 AnalogInput analogInput = await _analogInputRepository.FindById(inputId);
                 
-                if (!analogInput.ScanOn) continue;
+                if (!analogInput.ScanOn || analogInput.Deleted) continue;
                 Device device = await _deviceService.FindByIoAddress(analogInput.IOAddress);
 
                 var recordedValue = device.Value;
@@ -167,7 +191,6 @@ public class AnalogInputService : IAnalogInputService
                 
                 Alarm(analogInput, device);
 
-                Console.WriteLine("Tag Scanning -> " + "Device Name: " + device.Name + "; Value: " + device.Value);
                 InputRecordDto inputRecordDto = new InputRecordDto(inputRecord, device);
                 await _inputHub.Clients.All
                     .ReceiveData(inputRecordDto);

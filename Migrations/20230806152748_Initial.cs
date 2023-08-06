@@ -25,7 +25,8 @@ namespace DataTrack.Migrations
                     ScanOn = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     LowLimit = table.Column<double>(type: "double", nullable: false),
                     HighLimit = table.Column<double>(type: "double", nullable: false),
-                    Unit = table.Column<string>(type: "longtext", nullable: false)
+                    Unit = table.Column<string>(type: "longtext", nullable: false),
+                    Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,7 +44,8 @@ namespace DataTrack.Migrations
                     LowLimit = table.Column<double>(type: "double", nullable: false),
                     HighLimit = table.Column<double>(type: "double", nullable: false),
                     Unit = table.Column<string>(type: "longtext", nullable: false),
-                    InitialValue = table.Column<double>(type: "double", nullable: false)
+                    InitialValue = table.Column<double>(type: "double", nullable: false),
+                    Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,7 +64,8 @@ namespace DataTrack.Migrations
                     Value = table.Column<double>(type: "double", nullable: false),
                     UpperBound = table.Column<int>(type: "int", nullable: false),
                     IsDigital = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Driver = table.Column<string>(type: "longtext", nullable: false)
+                    Driver = table.Column<string>(type: "longtext", nullable: false),
+                    Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +81,8 @@ namespace DataTrack.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false),
                     IOAddress = table.Column<string>(type: "longtext", nullable: false),
                     ScanTime = table.Column<int>(type: "int", nullable: false),
-                    ScanOn = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    ScanOn = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -93,7 +97,8 @@ namespace DataTrack.Migrations
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false),
                     IOAddress = table.Column<string>(type: "longtext", nullable: false),
-                    InitialValue = table.Column<double>(type: "double", nullable: false)
+                    InitialValue = table.Column<double>(type: "double", nullable: false),
+                    Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {

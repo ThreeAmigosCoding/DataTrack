@@ -8,16 +8,18 @@ public class DigitalOutput : IBaseEntity
     public string Description { get; set; }
     public string IOAddress { get; set; }
     public double InitialValue { get; set; }
+    public bool Deleted { get; set; }
 
     public DigitalOutput()
     {
     }
 
-    public DigitalOutput(Guid id, string description, string ioAddress, double initialValue)
+    public DigitalOutput(Guid id, string description, string ioAddress, double initialValue, bool deleted)
     {
         Id = id;
         Description = description;
         IOAddress = ioAddress;
         InitialValue = initialValue;
+        Deleted = deleted;
     }
 }

@@ -11,6 +11,7 @@ public class DigitalInputService : IDigitalInputService
 {
     private readonly IDigitalInputRepository _digitalInputRepository;
     private readonly IDigitalOutputRepository _digitalOutputRepository;
+    private readonly IDeviceRepository _deviceRepository;
     
     private readonly IDeviceService _deviceService;
     private readonly IUserService _userService;
@@ -26,11 +27,13 @@ public class DigitalInputService : IDigitalInputService
         IDeviceService deviceService, 
         IUserService userService,
         IDigitalInputRecordService digitalInputRecordService,
-        IHubContext<InputHub, IInputClient> inputHub
+        IHubContext<InputHub, IInputClient> inputHub,
+        IDeviceRepository deviceRepository
         )
     {
         _digitalInputRepository = digitalInputRepository;
         _digitalOutputRepository = digitalOutputRepository;
+        _deviceRepository = deviceRepository;
         
         _deviceService = deviceService;
         _userService = userService;
@@ -66,7 +69,7 @@ public class DigitalInputService : IDigitalInputService
     
     public async void StartReadingAll()
     {
-        List<DigitalInput> digitalInputs = (await _digitalInputRepository.ReadAll()).ToList();
+        List<DigitalInput> digitalInputs = (await _digitalInputRepository.ReadAll()).Where(d => !d.Deleted).ToList();
         foreach (DigitalInput digitalInput in digitalInputs)
         {
             StartReading(digitalInput.Id);
@@ -81,6 +84,7 @@ public class DigitalInputService : IDigitalInputService
 
         foreach (var input in user.DigitalInputs)
         {
+            if (input.Deleted) continue;
             var device = await _deviceService.FindByIoAddress(input.IOAddress);
             var digitalInputRecord = new DigitalInputRecord
             {
@@ -89,6 +93,7 @@ public class DigitalInputService : IDigitalInputService
                 Value = device.Value,
                 DigitalInput = input
             };
+            
             inputRecords.Add(new InputRecordDto(digitalInputRecord, device));
         }
 
@@ -107,6 +112,24 @@ public class DigitalInputService : IDigitalInputService
         return (await _digitalInputRepository.ReadAll()).Select(i => i.Id).ToList();
     }
 
+    public async Task DeleteInput(string ioAddress)
+    {
+        DigitalInput input = (await _digitalInputRepository.ReadAll())
+            .FirstOrDefault(i => i.IOAddress == ioAddress);
+        input.Deleted = true;
+
+        Device device = await _deviceRepository.FindByIoAddress(ioAddress);
+        device.Deleted = true;
+        
+        DigitalOutput output = (await _digitalOutputRepository.ReadAll())
+            .FirstOrDefault(o => o.IOAddress == ioAddress);
+        output.Deleted = true;
+        
+        await _digitalInputRepository.Update(input);
+        await _deviceRepository.Update(device);
+        await _digitalOutputRepository.Update(output);
+    }
+
     public void StartReading(Guid inputId)
     {
         Task.Run(async () =>
@@ -115,7 +138,7 @@ public class DigitalInputService : IDigitalInputService
             {
                 DigitalInput digitalInput = await _digitalInputRepository.Read(inputId);
                 
-                if (!digitalInput.ScanOn) continue;
+                if (!digitalInput.ScanOn || digitalInput.Deleted) continue;
                 Device device = await _deviceService.FindByIoAddress(digitalInput.IOAddress);
 
                 DigitalInputRecord digitalInputRecord = new DigitalInputRecord
@@ -127,7 +150,6 @@ public class DigitalInputService : IDigitalInputService
                 };
                 digitalInputRecord = await _digitalInputRecordService.Create(digitalInputRecord);
                 
-                Console.WriteLine("Tag Scanning -> " + "Device Name: " + device.Name + "; Value: " + device.Value);
                 InputRecordDto inputRecordDto = new InputRecordDto(digitalInputRecord, device);
                 await _inputHub.Clients.All
                     .ReceiveData(inputRecordDto);

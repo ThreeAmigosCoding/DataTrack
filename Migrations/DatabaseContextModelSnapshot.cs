@@ -79,6 +79,9 @@ namespace DataTrack.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -136,6 +139,9 @@ namespace DataTrack.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -167,6 +173,9 @@ namespace DataTrack.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Driver")
                         .IsRequired()
@@ -202,6 +211,9 @@ namespace DataTrack.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -249,6 +261,9 @@ namespace DataTrack.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Description")
                         .IsRequired()
